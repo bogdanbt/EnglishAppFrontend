@@ -1,0 +1,36 @@
+.progress-bar-container {
+  height: 12px;
+  background-color: #e0e0e0;
+  border-radius: 20px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(to right, #00c6ff, #0072ff);
+  transition: width 0.6s ease;
+}
+
+.lesson-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  background-color: white;
+  z-index: 1;
+}
+
+.lesson-card-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background: linear-gradient(to right, #d4edda, #d4edda);
+  z-index: 0;
+  transition: width 0.6s ease;
+}
+
+.lesson-card-content {
+  position: relative;
+  z-index: 2;
+}
