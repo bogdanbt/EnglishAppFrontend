@@ -53,7 +53,7 @@ const Lesson = () => {
 
           {/* 🔹 Добавляем кнопки перехода на игры */}
           <div className="mt-4 text-center">
-            <Link
+            {/* <Link
               to={`/game-memo/course/${encodeURIComponent(
                 courseName
               )}/lesson/${encodeURIComponent(lessonName)}`}
@@ -68,7 +68,35 @@ const Lesson = () => {
               className="btn btn-outline-secondary"
             >
               game-puzzle
+            </Link> */}
+            <Link
+              to={`/daily-games/course/${encodeURIComponent(
+                courseName
+              )}/lesson/${encodeURIComponent(lessonName)}`}
+              className="btn btn-outline-success mt-3"
+            >
+              🎮 Daily Games
             </Link>
+          </div>
+          <div className="text-center">
+            <button
+              className="btn btn-outline-danger mt-3"
+              onClick={async () => {
+                try {
+                  await API.put("/lesson-progress", {
+                    userId: user.id,
+                    courseName: decodedCourseName,
+                    lessonName: decodedLessonName,
+                    repeats: 0,
+                  });
+                  alert("Прогресс обнулён!");
+                } catch (err) {
+                  console.error("Ошибка сброса прогресса:", err);
+                }
+              }}
+            >
+              🔄 Обнулить прогресс
+            </button>
           </div>
         </>
       ) : (

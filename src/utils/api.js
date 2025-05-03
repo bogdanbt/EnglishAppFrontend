@@ -1,7 +1,8 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:5000",
+  // baseURL: "http://localhost:5000",
+  baseURL: "https://englishappbackend.onrender.com",
   withCredentials: true, // Нужно для работы с куками (refreshToken)
 });
 
@@ -28,7 +29,8 @@ API.interceptors.response.use(
 
       try {
         const { data } = await axios.post(
-          "http://localhost:5000/auth/refresh",
+          // "http://localhost:5000/auth/refresh",
+          "https://englishappbackend.onrender.com/auth/refresh",
           {},
           { withCredentials: true }
         );

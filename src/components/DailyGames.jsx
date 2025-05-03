@@ -1,14 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useParams } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
+import API from "../utils/api";
 import PuzzleGameCore from "./PuzzleGameCore";
 import TextGameCore from "./TextGameCore";
 // import WordAssociations from "./WordAssociations";
-import CONFIG from "../config";
+// import CONFIG from "../config";
 import "./WordIntervalPuzzle.css";
 import TranslationGame from "./TranslationGame";
 const DailyGames = () => {
-  const { lesson } = useParams();
+  // const { lesson } = useParams();
+  const { user } = useContext(AuthContext);
+  const { courseName, lessonName } = useParams();
+  const decodedCourseName = decodeURIComponent(courseName);
+  const decodedLessonName = decodeURIComponent(lessonName);
 
+  //
   const [wordList, setWordList] = useState([]);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [currentGameType, setCurrentGameType] = useState("text"); // "text", "association", "puzzle"
@@ -18,16 +25,14 @@ const DailyGames = () => {
   const [gameCompleted, setGameCompleted] = useState(false);
 
   useEffect(() => {
+    if (!user || !user.id) return;
+
     const fetchWords = async () => {
       try {
-        const response = await fetch(
-          `${CONFIG.API_URL}/api/words?lesson=${lesson}`
+        const response = await API.get(
+          `/words/${user.id}/${decodedCourseName}/${decodedLessonName}`
         );
-        if (!response.ok) {
-          throw new Error(`Ошибка HTTP: ${response.status}`);
-        }
-        const data = await response.json();
-        setWordList(data);
+        setWordList(response.data);
         setLoading(false);
       } catch (err) {
         console.error("Ошибка при загрузке слов:", err);
@@ -37,7 +42,7 @@ const DailyGames = () => {
     };
 
     fetchWords();
-  }, [lesson]);
+  }, [user, decodedCourseName, decodedLessonName]);
 
   const handleNextGame = () => {
     console.log("Переход к следующей игре");

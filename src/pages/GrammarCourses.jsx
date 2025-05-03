@@ -3,46 +3,40 @@ import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import API from "../utils/api";
 
-const Courses = () => {
+const GrammarCourses = () => {
   const { user } = useContext(AuthContext);
   const [courses, setCourses] = useState([]);
   const navigate = useNavigate();
   useEffect(() => {
     if (!user || !user.id) return;
 
-    const fetchCourses = async () => {
+    const fetchGrammarCourses = async () => {
       try {
-        const response = await API.get(`/courses/${user.id}`);
+        const response = await API.get(`/grammar-courses/${user.id}`);
         setCourses(response.data.courses);
       } catch (error) {
-        console.error("Ошибка загрузки курсов:", error);
+        console.error("Ошибка загрузки грамматических курсов:", error);
       }
     };
 
-    fetchCourses();
+    fetchGrammarCourses();
   }, [user]);
 
   return (
     <div className="container mt-5">
-      <h2 className="text-center">Ваши курсы</h2>
+      <h2 className="text-center">Курсы по грамматике</h2>
       <div className="text-center my-4">
         <button
           className="btn btn-primary btn-lg"
-          onClick={() => navigate("/import-vocabulary")}
+          onClick={() => navigate("/import-grammar")}
         >
           📦 Import
         </button>
       </div>
       {courses.length === 0 ? (
-        <div className="text-center mt-4">
-          <p>
-            У вас пока нет загруженных курсов. загрузите слова через нашу
-            функцию импорт
-          </p>
-          {/* <Link to="/settings" className="btn btn-primary">
-            Настройки
-          </Link> */}
-        </div>
+        <p className="text-center mt-4">
+          У вас пока нет грамматических курсов.
+        </p>
       ) : (
         <div className="row">
           {courses.map((course, index) => (
@@ -50,10 +44,10 @@ const Courses = () => {
               <div className="card p-3 shadow-sm">
                 <h5 className="text-center">{course}</h5>
                 <Link
-                  to={`/course/${encodeURIComponent(course)}`}
+                  to={`/grammar-course/${encodeURIComponent(course)}`}
                   className="btn btn-outline-primary mt-2"
                 >
-                  Перейти
+                  Перейти к урокам
                 </Link>
               </div>
             </div>
@@ -64,4 +58,4 @@ const Courses = () => {
   );
 };
 
-export default Courses;
+export default GrammarCourses;
