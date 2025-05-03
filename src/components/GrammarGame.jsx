@@ -41,29 +41,30 @@ const GrammarGame = () => {
     const current = sentences[currentIndex];
     const base = current.sentenceGrammar.split(" ");
     const extra = current.extraWords || [];
-    const allPieces = shuffleArray([...base, ...extra]);
+
+    const allPieces = shuffleArray(
+      [...base, ...extra].map((word, index) => ({ id: `${index}-${word}`, text: word }))
+    );
 
     setPieces(allPieces);
     setSelected([]);
     setFeedback(null);
   }, [sentences, currentIndex]);
 
-  const handleWordClick = (word) => {
-    if (selected.includes(word)) return;
-    const updated = [...selected, word];
+  const handleWordClick = (wordObj) => {
+    if (selected.find((w) => w.id === wordObj.id)) return;
+    const updated = [...selected, wordObj];
     setSelected(updated);
 
-    // Автоматическая проверка
     const correctWords = sentences[currentIndex].sentenceGrammar.split(" ");
     if (updated.length === correctWords.length) {
       const isCorrect =
-        updated.join(" ") === sentences[currentIndex].sentenceGrammar;
+        updated.map((w) => w.text).join(" ") === sentences[currentIndex].sentenceGrammar;
       setFeedback(isCorrect ? "✅ Верно!" : "❌ Ошибка!");
 
       if (isCorrect) {
         setTimeout(async () => {
           if (currentIndex + 1 >= sentences.length) {
-            // ✅ Инкремент прогресса урока
             try {
               await API.patch("/grammar-progress/increment", {
                 userId: user.id,
@@ -74,9 +75,7 @@ const GrammarGame = () => {
               console.error("Ошибка при обновлении прогресса:", err);
             }
 
-            navigate(
-              `/grammar-course/${encodeURIComponent(courseGrammarName)}`
-            );
+            navigate(`/grammar-course/${encodeURIComponent(courseGrammarName)}`);
           } else {
             setCurrentIndex((prev) => prev + 1);
           }
@@ -89,7 +88,10 @@ const GrammarGame = () => {
     const current = sentences[currentIndex];
     const base = current.sentenceGrammar.split(" ");
     const extra = current.extraWords || [];
-    const allPieces = shuffleArray([...base, ...extra]);
+
+    const allPieces = shuffleArray(
+      [...base, ...extra].map((word, index) => ({ id: `${index}-${word}`, text: word }))
+    );
 
     setPieces(allPieces);
     setSelected([]);
@@ -106,20 +108,20 @@ const GrammarGame = () => {
 
       <div className="d-flex flex-wrap justify-content-center mb-3">
         {pieces
-          .filter((word) => !selected.includes(word))
-          .map((word, index) => (
+          .filter((word) => !selected.find((w) => w.id === word.id))
+          .map((word) => (
             <button
-              key={index}
+              key={word.id}
               className="btn btn-outline-primary m-1"
               onClick={() => handleWordClick(word)}
             >
-              {word}
+              {word.text}
             </button>
           ))}
       </div>
 
       <div className="text-center mb-3">
-        <strong>Ваш ответ:</strong> {selected.join(" ")}
+        <strong>Ваш ответ:</strong> {selected.map((w) => w.text).join(" ")}
       </div>
 
       <div className="text-center">
