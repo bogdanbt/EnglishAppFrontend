@@ -26,7 +26,6 @@ const Register = () => {
   };
 
   if (loading) {
-    // 👇 ДОБАВИЛ: отображение спиннера при загрузке
     return (
       <div
         className="d-flex justify-content-center align-items-center"

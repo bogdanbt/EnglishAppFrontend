@@ -21,7 +21,7 @@ const GrammarLesson = () => {
         );
         setSentences(response.data);
       } catch (error) {
-        console.error("Ошибка загрузки предложений:", error);
+        console.error("Error loading grammar sentences:", error);
       }
     };
 
@@ -30,10 +30,10 @@ const GrammarLesson = () => {
 
   return (
     <div className="container mt-5">
-      <h2 className="text-center">Урок: {decodedLessonName}</h2>
+      <h2 className="text-center">Lesson: {decodedLessonName}</h2>
 
       {sentences.length === 0 ? (
-        <p className="text-center mt-4">Пока нет предложений в этом уроке.</p>
+        <p className="text-center mt-4">No sentences in this lesson yet.</p>
       ) : (
         <>
           <div className="list-group mb-4">
@@ -42,21 +42,20 @@ const GrammarLesson = () => {
                 key={index}
                 className="list-group-item d-flex flex-column align-items-start"
               >
-                <strong>RU:</strong> {item.translation}
+                <strong>Translation:</strong> {item.translation}
                 <span className="text-muted mt-1">
-                  EN: {item.sentenceGrammar}
+                  Sentence: {item.sentenceGrammar}
                 </span>
-
-                <div className="mt-2"> 
+                <div className="mt-2">
                   <button
                     className="btn btn-sm btn-outline-primary me-2"
                     onClick={() => {
                       const newSentence = prompt(
-                        "Новое английское предложение:",
+                        "New English sentence:",
                         item.sentenceGrammar
                       );
                       const newTranslation = prompt(
-                        "Новый перевод:",
+                        "New translation:",
                         item.translation
                       );
                       if (newSentence && newTranslation) {
@@ -65,16 +64,13 @@ const GrammarLesson = () => {
                           translation: newTranslation,
                         })
                           .then(() => window.location.reload())
-                          .catch((err) =>
-                            console.error("Ошибка редактирования:", err)
-                          );
+                          .catch((err) => console.error("Edit error:", err));
                       }
                     }}
                   >
-                    ✏️ Редактировать
+                    Edit
                   </button>
                 </div>
-              
               </div>
             ))}
           </div>
@@ -86,9 +82,10 @@ const GrammarLesson = () => {
               )}/lesson/${encodeURIComponent(lessonGrammarName)}/game`}
               className="btn btn-success"
             >
-              🎮 Запустить игру
+              Start Game
             </Link>
           </div>
+
           <button
             className="btn btn-outline-danger mt-3"
             onClick={async () => {
@@ -99,39 +96,39 @@ const GrammarLesson = () => {
                   lessonGrammarName: decodedLessonName,
                   repeats: 0,
                 });
-                alert("Прогресс сброшен!");
+                alert("Progress reset.");
               } catch (err) {
-                console.error("Ошибка сброса прогресса:", err);
+                console.error("Reset error:", err);
               }
             }}
           >
-            🔄 Обнулить прогресс
+            Reset Progress
           </button>
-          <div className="text-center mt-4"> 
+
+          <div className="text-center mt-4">
             <button
               className="btn btn-danger"
               onClick={async () => {
                 if (
                   window.confirm(
-                    "Вы уверены, что хотите удалить весь урок?"
+                    "Are you sure you want to delete the entire lesson?"
                   )
                 ) {
                   try {
                     await API.delete(
                       `/grammar/${user.id}/${decodedCourseName}/${decodedLessonName}`
                     );
-                    alert("Урок удалён.");
+                    alert("Lesson deleted.");
                     navigate(`/grammar-course/${courseGrammarName}`);
                   } catch (err) {
-                    console.error("Ошибка удаления урока:", err);
+                    console.error("Delete error:", err);
                   }
                 }
               }}
             >
-              🗑️ Удалить весь урок
+              Delete Entire Lesson
             </button>
           </div>
-
         </>
       )}
     </div>

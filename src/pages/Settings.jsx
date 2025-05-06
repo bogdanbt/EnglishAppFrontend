@@ -8,31 +8,31 @@ const Settings = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
+
   const loadDefaultWords = async () => {
     if (!user || !user.id) {
-      setMessage("Ошибка: Пользователь не найден");
+      setMessage("Error: User not found.");
       return;
     }
 
     setLoading(true);
-    setMessage("Загрузка...");
+    setMessage("Loading default content...");
 
     try {
-      // Используем полный путь к API
       const response = await API.post(`${API.defaults.baseURL}/load-defaults`, {
         userId: user.id,
       });
 
-      setMessage(response.data.message);
+      setMessage(response.data.message || "Default words loaded successfully.");
 
-      // ✅ Автообновление курсов после загрузки
       setTimeout(() => {
         navigate("/courses");
-        // window.location.reload();
       }, 1500);
     } catch (error) {
-      console.error("Ошибка при загрузке базовых слов:", error);
-      setMessage(error.response?.data?.message || "Ошибка загрузки слов");
+      console.error("Error loading default words:", error);
+      setMessage(
+        error.response?.data?.message || "An error occurred while loading."
+      );
     }
 
     setLoading(false);
@@ -40,14 +40,14 @@ const Settings = () => {
 
   return (
     <div className="container mt-5 text-center">
-      <h2>Настройки</h2>
+      <h2>Settings</h2>
       <div className="mt-4">
         <button
           className="btn btn-primary"
           onClick={loadDefaultWords}
           disabled={loading}
         >
-          {loading ? "Загрузка..." : "Загрузить базовые слова"}
+          {loading ? "Loading..." : "Load Default Words"}
         </button>
         {message && (
           <p className="mt-3 text-muted alert alert-info">{message}</p>

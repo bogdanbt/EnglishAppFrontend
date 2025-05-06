@@ -7,6 +7,7 @@ const GrammarCourses = () => {
   const { user } = useContext(AuthContext);
   const [courses, setCourses] = useState([]);
   const navigate = useNavigate();
+
   useEffect(() => {
     if (!user || !user.id) return;
 
@@ -15,7 +16,7 @@ const GrammarCourses = () => {
         const response = await API.get(`/grammar-courses/${user.id}`);
         setCourses(response.data.courses);
       } catch (error) {
-        console.error("Ошибка загрузки грамматических курсов:", error);
+        console.error("Failed to load grammar courses:", error);
       }
     };
 
@@ -24,18 +25,20 @@ const GrammarCourses = () => {
 
   return (
     <div className="container mt-5">
-      <h2 className="text-center">Курсы по грамматике</h2>
+      <h2 className="text-center">Grammar Courses</h2>
+
       <div className="text-center my-4">
         <button
           className="btn btn-primary btn-lg"
           onClick={() => navigate("/import-grammar")}
         >
-          📦 Import
+          Import
         </button>
       </div>
+
       {courses.length === 0 ? (
         <p className="text-center mt-4">
-          У вас пока нет грамматических курсов.
+          You don't have any grammar courses yet.
         </p>
       ) : (
         <div className="row">
@@ -47,7 +50,7 @@ const GrammarCourses = () => {
                   to={`/grammar-course/${encodeURIComponent(course)}`}
                   className="btn btn-outline-primary mt-2"
                 >
-                  Перейти к урокам
+                  Go to Lessons
                 </Link>
               </div>
             </div>

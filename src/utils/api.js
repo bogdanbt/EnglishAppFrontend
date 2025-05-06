@@ -1,12 +1,11 @@
 import axios from "axios";
 
 const API = axios.create({
-  // baseURL: "http://localhost:5000",
   baseURL: "https://englishappbackend.onrender.com",
-  withCredentials: true, // Нужно для работы с куками (refreshToken)
+  withCredentials: true, // Required for cookies (refreshToken)
 });
 
-// ✅ Интерцептор для добавления `accessToken`
+// ✅ Add accessToken to every request if available
 API.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("accessToken");
@@ -18,7 +17,7 @@ API.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// ✅ Интерцептор для автоматического обновления `accessToken`
+// ✅ Automatically refresh accessToken on 401
 API.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -29,7 +28,6 @@ API.interceptors.response.use(
 
       try {
         const { data } = await axios.post(
-          // "http://localhost:5000/auth/refresh",
           "https://englishappbackend.onrender.com/auth/refresh",
           {},
           { withCredentials: true }
@@ -38,11 +36,9 @@ API.interceptors.response.use(
         localStorage.setItem("accessToken", data.accessToken);
         originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
 
-        return axios(originalRequest); // Повторяем запрос с новым токеном
+        return axios(originalRequest); // Retry with new token
       } catch (refreshError) {
         localStorage.removeItem("accessToken");
-        //window.location.href = "/login"; // Разлогиниваем, если refresh не сработал
-        //localStorage.removeItem("accessToken");
         return Promise.reject(refreshError);
       }
     }

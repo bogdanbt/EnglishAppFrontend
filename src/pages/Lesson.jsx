@@ -8,8 +8,7 @@ const Lesson = () => {
   const { courseName, lessonName } = useParams();
   const decodedCourseName = decodeURIComponent(courseName);
   const decodedLessonName = decodeURIComponent(lessonName);
-  console.log(courseName);
-  console.log(lessonName);
+
   const [words, setWords] = useState([]);
 
   useEffect(() => {
@@ -20,10 +19,9 @@ const Lesson = () => {
         const response = await API.get(
           `/words/${user.id}/${decodedCourseName}/${decodedLessonName}`
         );
-        console.log(response);
         setWords(response.data);
       } catch (error) {
-        console.error("Ошибка загрузки слов:", error);
+        console.error("Error loading words:", error);
       }
     };
 
@@ -32,10 +30,10 @@ const Lesson = () => {
 
   return (
     <div className="container mt-5">
-      <h2 className="text-center">Урок: {decodedLessonName}</h2>
+      <h2 className="text-center">Lesson: {decodedLessonName}</h2>
 
       {words && words.length === 0 ? (
-        <p className="text-center mt-4">В этом уроке пока нет слов.</p>
+        <p className="text-center mt-4">No words in this lesson yet.</p>
       ) : words ? (
         <>
           <div className="row">
@@ -51,15 +49,16 @@ const Lesson = () => {
             ))}
           </div>
 
-          {/* 🔹 Добавляем кнопки перехода на игры */}
+          {/* Action buttons for games */}
           <div className="mt-4 text-center">
-            {/* <Link
+            {/* Uncomment to enable other games:
+            <Link
               to={`/game-memo/course/${encodeURIComponent(
                 courseName
               )}/lesson/${encodeURIComponent(lessonName)}`}
               className="btn btn-outline-primary me-3"
             >
-              game-memo
+              Game Memo
             </Link>
             <Link
               to={`/game-puzzle/course/${encodeURIComponent(
@@ -67,7 +66,7 @@ const Lesson = () => {
               )}/lesson/${encodeURIComponent(lessonName)}`}
               className="btn btn-outline-secondary"
             >
-              game-puzzle
+              Game Puzzle
             </Link> */}
             <Link
               to={`/daily-games/course/${encodeURIComponent(
@@ -75,9 +74,10 @@ const Lesson = () => {
               )}/lesson/${encodeURIComponent(lessonName)}`}
               className="btn btn-outline-success mt-3"
             >
-              🎮 Daily Games
+              Start Daily Games
             </Link>
           </div>
+
           <div className="text-center">
             <button
               className="btn btn-outline-danger mt-3"
@@ -89,20 +89,21 @@ const Lesson = () => {
                     lessonName: decodedLessonName,
                     repeats: 0,
                   });
-                  alert("Прогресс обнулён!");
+                  alert("Progress has been reset.");
                 } catch (err) {
-                  console.error("Ошибка сброса прогресса:", err);
+                  console.error("Error resetting progress:", err);
                 }
               }}
             >
-              🔄 Обнулить прогресс
+              Reset Progress
             </button>
           </div>
         </>
       ) : (
-        <p className="text-center mt-4">Загрузка...</p>
+        <p className="text-center mt-4">Loading...</p>
       )}
     </div>
   );
 };
+
 export default Lesson;

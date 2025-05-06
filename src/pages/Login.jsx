@@ -18,14 +18,13 @@ const Login = () => {
       login(res.data.accessToken);
       navigate("/");
     } catch (error) {
-      alert("Invalid credentials");
+      alert("Invalid credentials. Please try again.");
     } finally {
-      setLoading(false); // 👈 ДОБАВИЛ: выключаем спиннер
+      setLoading(false);
     }
   };
 
   if (loading) {
-    // 👇 ДОБАВИЛ: отображение спиннера при загрузке
     return (
       <div
         className="d-flex justify-content-center align-items-center"
@@ -43,30 +42,40 @@ const Login = () => {
   }
 
   return (
-    <div>
-      <h2>Login</h2>
+    <div className="container mt-5" style={{ maxWidth: "400px" }}>
+      <h2 className="mb-4 text-center">Login</h2>
       <form onSubmit={handleLogin}>
         <div className="mb-3">
-          <label>Email</label>
+          <label htmlFor="email" className="form-label">
+            Email address
+          </label>
           <input
+            id="email"
             type="email"
             className="form-control"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter your email"
             required
           />
         </div>
-        <div className="mb-3">
-          <label>Password</label>
+        <div className="mb-4">
+          <label htmlFor="password" className="form-label">
+            Password
+          </label>
           <input
+            id="password"
             type="password"
             className="form-control"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter your password"
             required
           />
         </div>
-        <button className="btn btn-primary">Login</button>
+        <button type="submit" className="btn btn-primary w-100">
+          Sign In
+        </button>
       </form>
     </div>
   );

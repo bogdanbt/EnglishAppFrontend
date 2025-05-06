@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import API from "../utils/api";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+
 const VocabularyManualImport = () => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ const VocabularyManualImport = () => {
       const res = await API.get(`/courses/${user.id}`);
       setCourses(res.data.courses);
     } catch (err) {
-      console.error("Ошибка загрузки курсов:", err);
+      console.error("Error loading courses:", err);
     }
   };
 
@@ -31,14 +32,12 @@ const VocabularyManualImport = () => {
       );
       setLessons(res.data.lessons);
     } catch (err) {
-      console.error("Ошибка загрузки уроков:", err);
+      console.error("Error loading lessons:", err);
     }
   };
 
   useEffect(() => {
-    if (user?.id) {
-      fetchCourses();
-    }
+    if (user?.id) fetchCourses();
   }, [user]);
 
   useEffect(() => {
@@ -68,7 +67,7 @@ const VocabularyManualImport = () => {
     const finalLesson = customLesson.trim() || selectedLesson;
 
     if (!finalCourse || !finalLesson) {
-      alert("Укажите курс и урок!");
+      alert("Please specify a course and a lesson.");
       return;
     }
 
@@ -84,33 +83,36 @@ const VocabularyManualImport = () => {
       }));
 
     if (prepared.length === 0) {
-      alert("Нет слов для импорта.");
+      alert("No words to import.");
       return;
     }
 
     try {
       const res = await API.post("/words", prepared);
-      alert(`✅ Импортировано: ${res.data.inserted.length} слов`);
+      alert(`Successfully imported ${res.data.inserted.length} words.`);
       setEntries([{ word: "", translation: "" }]);
     } catch (err) {
-      console.error("Ошибка импорта:", err);
-      alert("Ошибка при импорте");
+      console.error("Import error:", err);
+      alert("Error during import.");
     }
   };
+
   return (
     <div className="container mt-5">
-      <h2>Ручной импорт слов</h2>
+      <h2>Manual Vocabulary Import</h2>
+
       <div className="text-center my-4">
         <button
           className="btn btn-primary btn-lg"
           onClick={() => navigate("/import-vocabulary-extended")}
         >
-          📦 Import (Extended)
+          Open Extended Import
         </button>
       </div>
+
       <div className="row mb-4">
         <div className="col-md-6">
-          <label>Выберите курс:</label>
+          <label>Select a course:</label>
           <select
             className="form-select"
             value={selectedCourse}
@@ -121,7 +123,7 @@ const VocabularyManualImport = () => {
             }}
             disabled={customCourse.trim() !== ""}
           >
-            <option value="">— выбрать курс —</option>
+            <option value="">— select a course —</option>
             {courses.map((course, i) => (
               <option key={i} value={course}>
                 {course}
@@ -130,14 +132,14 @@ const VocabularyManualImport = () => {
           </select>
           <input
             className="form-control mt-2"
-            placeholder="или введите новый курс"
+            placeholder="or enter a new course"
             value={customCourse}
             onChange={(e) => setCustomCourse(e.target.value)}
           />
         </div>
 
         <div className="col-md-6">
-          <label>Выберите урок:</label>
+          <label>Select a lesson:</label>
           <select
             className="form-select"
             value={selectedLesson}
@@ -150,7 +152,7 @@ const VocabularyManualImport = () => {
               (!selectedCourse && !customCourse.trim())
             }
           >
-            <option value="">— выбрать урок —</option>
+            <option value="">— select a lesson —</option>
             {lessons.map((lesson, i) => (
               <option key={i} value={lesson}>
                 {lesson}
@@ -159,7 +161,7 @@ const VocabularyManualImport = () => {
           </select>
           <input
             className="form-control mt-2"
-            placeholder="или введите новый урок"
+            placeholder="or enter a new lesson"
             value={customLesson}
             onChange={(e) => setCustomLesson(e.target.value)}
           />
@@ -169,8 +171,8 @@ const VocabularyManualImport = () => {
       <table className="table">
         <thead>
           <tr>
-            <th>Слово (EN)</th>
-            <th>Перевод (RU)</th>
+            <th>Word (EN)</th>
+            <th>Translation (RU)</th>
             <th></th>
           </tr>
         </thead>
@@ -201,7 +203,7 @@ const VocabularyManualImport = () => {
                     className="btn btn-sm btn-danger"
                     onClick={() => removeRow(index)}
                   >
-                    ❌
+                    Remove
                   </button>
                 )}
               </td>
@@ -211,13 +213,13 @@ const VocabularyManualImport = () => {
       </table>
 
       <button className="btn btn-outline-secondary mb-3" onClick={addRow}>
-        ➕ Добавить слово
+        Add Word
       </button>
 
       <br />
 
       <button className="btn btn-success" onClick={handleSubmit}>
-        📥 Импортировать
+        Import Words
       </button>
     </div>
   );

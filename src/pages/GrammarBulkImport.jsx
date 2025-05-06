@@ -32,7 +32,7 @@ const GrammarBulkImport = () => {
       if (!course || !lesson || !sentence) {
         previewTable.push({
           row,
-          status: "❌ пропущено (пустой курс/урок/предложение)",
+          status: "Skipped (missing course/lesson/sentence)",
         });
         return;
       }
@@ -50,7 +50,7 @@ const GrammarBulkImport = () => {
       };
 
       objects.push(obj);
-      previewTable.push({ row, status: "✅ готово" });
+      previewTable.push({ row, status: "Ready" });
     });
 
     setParsedObjects(objects);
@@ -59,37 +59,37 @@ const GrammarBulkImport = () => {
 
   const handleImport = async () => {
     if (parsedObjects.length === 0 && rawData.trim()) {
-      alert("Сначала нажмите 'Предпросмотр', чтобы подготовить данные.");
+      alert("Please click 'Preview' first to prepare the data.");
       return;
     }
 
     if (parsedObjects.length === 0) {
-      alert("Нет данных для импорта.");
+      alert("No data to import.");
       return;
     }
 
     try {
       const res = await API.post("/grammar", parsedObjects);
-      alert(`✅ Импортировано ${res.data.inserted.length} предложений`);
+      alert(`Successfully imported ${res.data.inserted.length} sentences.`);
       setRawData("");
       setParsedObjects([]);
       setPreview([]);
     } catch (err) {
-      console.error("Ошибка импорта:", err);
-      alert("Ошибка при импорте данных");
+      console.error("Import error:", err);
+      alert("An error occurred during import.");
     }
   };
 
   return (
     <div className="container mt-5">
-      <h2>Импорт из таблицы (расширенный режим)</h2>
+      <h2>Bulk Import from Table</h2>
 
       <p className="alert alert-light">
-        <strong>Ожидаемый формат:</strong>
+        <strong>Expected format:</strong>
         <br />
-        <code>Курс / Урок / Предложение / Перевод / Лишние слова</code>
+        <code>Course / Lesson / Sentence / Translation / Extra Words</code>
         <br />
-        <em>Пример:</em>
+        <em>Example:</em>
         <br />
         <code>
           A2 / Past Simple / I went to school / Я пошёл в школу / never quickly
@@ -99,53 +99,55 @@ const GrammarBulkImport = () => {
 
       <div className="row my-3">
         <div className="col-md-6">
-          <label>Разделитель колонок:</label>
+          <label>Column delimiter:</label>
           <input
             className="form-control"
-            placeholder="например: / или ,"
+            placeholder="e.g. / or ,"
             value={colDelimiter}
             onChange={(e) => setColDelimiter(e.target.value)}
           />
         </div>
         <div className="col-md-6">
-          <label>Разделитель строк:</label>
+          <label>Row delimiter:</label>
           <input
             className="form-control"
-            placeholder="обычно: \n или ;"
+            placeholder="usually: \n or ;"
             value={rowDelimiter}
             onChange={(e) => setRowDelimiter(e.target.value)}
           />
         </div>
       </div>
 
-      <label className="mt-3">Вставьте данные:</label>
+      <label className="mt-3">Paste your data:</label>
       <textarea
         className="form-control"
         rows={10}
-        placeholder="Вставьте строки из таблицы по примеру"
+        placeholder="Paste rows from a spreadsheet in the format above"
         value={rawData}
         onChange={(e) => setRawData(e.target.value)}
       />
 
       <div className="mt-3 d-flex gap-2">
         <button className="btn btn-primary" onClick={parseData}>
-          🔍 Предпросмотр
+          Preview
         </button>
         <button className="btn btn-success" onClick={handleImport}>
-          📥 Импортировать
+          Import
         </button>
       </div>
 
       {preview.length > 0 && (
         <div className="mt-4">
-          <h5>Результат разбора:</h5>
+          <h5>Parse result:</h5>
           <ul>
             {preview.map((item, i) => (
               <li key={i}>
                 <code>{item.row}</code> —{" "}
                 <strong
                   style={{
-                    color: item.status.includes("❌") ? "crimson" : "green",
+                    color: item.status.includes("Skipped")
+                      ? "crimson"
+                      : "green",
                   }}
                 >
                   {item.status}

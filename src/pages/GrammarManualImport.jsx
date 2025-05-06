@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import API from "../utils/api";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+
 const GrammarManualImport = () => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const GrammarManualImport = () => {
       const res = await API.get(`/grammar-courses/${user.id}`);
       setCourses(res.data.courses);
     } catch (err) {
-      console.error("Ошибка загрузки курсов:", err);
+      console.error("Failed to load courses:", err);
     }
   };
 
@@ -33,7 +34,7 @@ const GrammarManualImport = () => {
       );
       setLessons(res.data.lessons);
     } catch (err) {
-      console.error("Ошибка загрузки уроков:", err);
+      console.error("Failed to load lessons:", err);
     }
   };
 
@@ -70,7 +71,7 @@ const GrammarManualImport = () => {
     const finalLesson = customLesson.trim() || selectedLesson;
 
     if (!finalCourse || !finalLesson) {
-      alert("Укажите курс и урок!");
+      alert("Please specify both course and lesson.");
       return;
     }
 
@@ -89,34 +90,38 @@ const GrammarManualImport = () => {
       }));
 
     if (prepared.length === 0) {
-      alert("Добавьте хотя бы одно предложение.");
+      alert("Please add at least one sentence.");
       return;
     }
 
     try {
       const res = await API.post("/grammar", prepared);
-      alert("✅ Импортировано: " + res.data.inserted.length + " предложений");
+      alert(
+        "Successfully imported: " + res.data.inserted.length + " sentences"
+      );
       setEntries([{ sentence: "", translation: "", extra: "" }]);
     } catch (err) {
-      console.error("Ошибка при импорте:", err);
-      alert("Ошибка при импорте");
+      console.error("Import error:", err);
+      alert("Error during import.");
     }
   };
 
   return (
     <div className="container mt-5">
-      <h2 className="mb-4">Импорт грамматических предложений</h2>
+      <h2 className="mb-4">Manual Grammar Sentence Import</h2>
+
       <div className="text-center my-4">
         <button
           className="btn btn-primary btn-lg"
           onClick={() => navigate("/import-grammar-extended")}
         >
-          📦 Import (Extended)
+          Import (Extended)
         </button>
       </div>
+
       <div className="mb-3 row">
         <div className="col-md-6">
-          <label>Выберите курс:</label>
+          <label>Select a course:</label>
           <select
             className="form-select"
             value={selectedCourse}
@@ -127,7 +132,7 @@ const GrammarManualImport = () => {
             }}
             disabled={customCourse.trim() !== ""}
           >
-            <option value="">— выбрать курс —</option>
+            <option value="">— select course —</option>
             {courses.map((course, i) => (
               <option key={i} value={course}>
                 {course}
@@ -137,14 +142,14 @@ const GrammarManualImport = () => {
 
           <input
             className="form-control mt-2"
-            placeholder="или введите новый курс"
+            placeholder="or enter a new course"
             value={customCourse}
             onChange={(e) => setCustomCourse(e.target.value)}
           />
         </div>
 
         <div className="col-md-6">
-          <label>Выберите урок:</label>
+          <label>Select a lesson:</label>
           <select
             className="form-select"
             value={selectedLesson}
@@ -157,7 +162,7 @@ const GrammarManualImport = () => {
               (!selectedCourse && !customCourse.trim())
             }
           >
-            <option value="">— выбрать урок —</option>
+            <option value="">— select lesson —</option>
             {lessons.map((lesson, i) => (
               <option key={i} value={lesson}>
                 {lesson}
@@ -167,7 +172,7 @@ const GrammarManualImport = () => {
 
           <input
             className="form-control mt-2"
-            placeholder="или введите новый урок"
+            placeholder="or enter a new lesson"
             value={customLesson}
             onChange={(e) => setCustomLesson(e.target.value)}
           />
@@ -176,12 +181,12 @@ const GrammarManualImport = () => {
 
       <hr />
 
-      <table className="table ">
+      <table className="table">
         <thead>
           <tr>
-            <th>Предложение (EN)</th>
-            <th>Перевод (RU)</th>
-            <th>Лишние слова</th>
+            <th>Sentence (EN)</th>
+            <th>Translation</th>
+            <th>Extra Words</th>
             <th></th>
           </tr>
         </thead>
@@ -209,7 +214,7 @@ const GrammarManualImport = () => {
               <td>
                 <input
                   className="form-control"
-                  placeholder="через пробел или запятую"
+                  placeholder="space or comma separated"
                   value={entry.extra}
                   onChange={(e) =>
                     handleEntryChange(index, "extra", e.target.value)
@@ -222,7 +227,7 @@ const GrammarManualImport = () => {
                     className="btn btn-sm btn-danger"
                     onClick={() => removeRow(index)}
                   >
-                    ❌
+                    Remove
                   </button>
                 )}
               </td>
@@ -232,13 +237,13 @@ const GrammarManualImport = () => {
       </table>
 
       <button className="btn btn-outline-secondary mb-3" onClick={addRow}>
-        ➕ Добавить строку
+        Add Row
       </button>
 
       <br />
 
       <button className="btn btn-success" onClick={handleSubmit}>
-        📥 Импортировать
+        Import
       </button>
     </div>
   );

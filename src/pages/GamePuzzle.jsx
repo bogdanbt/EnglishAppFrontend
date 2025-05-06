@@ -27,7 +27,7 @@ const GamePuzzle = () => {
         setWords(response.data);
         setLoading(false);
       } catch (error) {
-        console.error("Ошибка загрузки слов:", error);
+        console.error("Error loading words:", error);
         setLoading(false);
       }
     };
@@ -41,11 +41,11 @@ const GamePuzzle = () => {
     if (nextIndex < words.length) {
       setCurrentWordIndex(nextIndex);
     } else {
-      setGameFinished(true); // Урок завершён
+      setGameFinished(true);
     }
   };
 
-  // 🔥 Обновляем прогресс, если игра завершена
+  // Update progress when game is finished
   useEffect(() => {
     if (gameFinished && !progressUpdated) {
       const incrementProgress = async () => {
@@ -55,10 +55,10 @@ const GamePuzzle = () => {
             courseName: decodedCourseName,
             lessonName: decodedLessonName,
           });
-          console.log("Прогресс по пазлам обновлён ✅");
+          console.log("Puzzle progress updated.");
           setProgressUpdated(true);
         } catch (error) {
-          console.error("Ошибка при обновлении прогресса:", error);
+          console.error("Error updating progress:", error);
         }
       };
 
@@ -73,24 +73,24 @@ const GamePuzzle = () => {
   ]);
 
   if (loading) {
-    return <p className="text-center mt-4">Загрузка...</p>;
+    return <p className="text-center mt-4">Loading...</p>;
   }
 
   return (
     <div className="container mt-5 text-center">
-      <h2>Игра: Пазлы</h2>
-      <h4>Урок: {decodedLessonName}</h4>
+      <h2>Puzzle Game</h2>
+      <h4>Lesson: {decodedLessonName}</h4>
 
       {words.length === 0 ? (
-        <p>В этом уроке пока нет слов.</p>
+        <p>No words found for this lesson.</p>
       ) : gameFinished ? (
         <div className="my-5">
-          <h3 className="mb-3">🎉 Поздравляем! Вы прошли все слова! 🎉</h3>
+          <h3 className="mb-3">You have completed all words!</h3>
           <Link
             to={`/course/${encodeURIComponent(courseName)}`}
             className="btn btn-success"
           >
-            Назад к урокам
+            Back to lessons
           </Link>
         </div>
       ) : (

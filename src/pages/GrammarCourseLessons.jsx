@@ -25,9 +25,9 @@ const GrammarCourseLessons = () => {
         const progressRes = await API.get(
           `/grammar-progress/${user.id}/${decodedCourseName}`
         );
-        setProgress(progressRes.data); // массив: { lessonGrammarName, repeats }
+        setProgress(progressRes.data); // array: { lessonGrammarName, repeats }
       } catch (error) {
-        console.error("Ошибка загрузки грамматических уроков:", error);
+        console.error("Failed to load grammar lessons:", error);
       }
     };
 
@@ -48,10 +48,12 @@ const GrammarCourseLessons = () => {
 
   return (
     <div className="container mt-5">
-      <h2 className="text-center">Уроки курса: {decodedCourseName}</h2>
+      <h2 className="text-center">
+        Lessons for Grammar Course: {decodedCourseName}
+      </h2>
 
       {lessons.length === 0 ? (
-        <p className="text-center mt-4">Нет доступных грамматических уроков.</p>
+        <p className="text-center mt-4">No grammar lessons available.</p>
       ) : (
         <div className="row">
           {lessons.map((lesson, index) => (
@@ -70,7 +72,7 @@ const GrammarCourseLessons = () => {
                     )}/lesson/${encodeURIComponent(lesson)}`}
                     className="btn btn-outline-secondary w-100 mt-2"
                   >
-                    Открыть урок
+                    Open Lesson
                   </Link>
                 </div>
               </div>

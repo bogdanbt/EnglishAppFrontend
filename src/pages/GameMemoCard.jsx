@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useEffect, useState, useContext } from "react";
+import { Link, useParams } from "react-router-dom";
 import API from "../utils/api";
 import "../styles/MemoryGame.css";
 import { AuthContext } from "../context/AuthContext";
-import { useParams, Link } from "react-router-dom";
-// import { useNavigate } from "react-router-dom";
 
 const MemoGameCore = () => {
   const { user } = useContext(AuthContext);
@@ -14,7 +13,7 @@ const MemoGameCore = () => {
   const [shuffledPairs, setShuffledPairs] = useState([]);
   const [flippedPairs, setFlippedPairs] = useState([]);
   const [matchedPairs, setMatchedPairs] = useState([]);
-  const [progressUpdated, setProgressUpdated] = useState(false); // чтобы не вызывать дважды
+  const [progressUpdated, setProgressUpdated] = useState(false);
   const [gameFinished, setGameFinished] = useState(false);
 
   useEffect(() => {
@@ -52,19 +51,20 @@ const MemoGameCore = () => {
   const handlePairClick = (card) => {
     if (matchedPairs.includes(card.id) || flippedPairs.includes(card)) return;
 
-    //  Озвучиваем, если это английское слово
+    // Play pronunciation if it's an English word
     if (card.type === "word") {
       try {
         const audio = new Audio(
           `http://localhost:5000/speak/${encodeURIComponent(card.value)}`
         );
         audio.play().catch((err) => {
-          console.warn("Не удалось проиграть аудио:", err);
+          console.warn("Unable to play audio:", err);
         });
       } catch (error) {
-        console.warn("Ошибка в Audio:", error);
+        console.warn("Audio error:", error);
       }
     }
+
     const newFlippedPairs = [...flippedPairs, card];
     setFlippedPairs(newFlippedPairs);
 
@@ -73,7 +73,6 @@ const MemoGameCore = () => {
 
       if (firstCard.baseId === secondCard.baseId) {
         setMatchedPairs((prev) => [...prev, firstCard.id, secondCard.id]);
-
         setTimeout(() => {
           setFlippedPairs([]);
         }, 500);
@@ -86,7 +85,8 @@ const MemoGameCore = () => {
       setFlippedPairs([]);
     }
   };
-  // 🔥 Обновляем прогресс после прохождения
+
+  // Update progress after finishing the game
   useEffect(() => {
     const allMatched =
       shuffledPairs.length > 0 && matchedPairs.length === shuffledPairs.length;
@@ -99,11 +99,11 @@ const MemoGameCore = () => {
             courseName: decodedCourseName,
             lessonName: decodedLessonName,
           });
-          console.log("Прогресс успешно обновлён 🎉");
-          setProgressUpdated(true); // предотвращает повторный вызов
-          setGameFinished(true); // ✅ показываем сообщение и кнопку
+          console.log("Progress updated successfully.");
+          setProgressUpdated(true);
+          setGameFinished(true);
         } catch (error) {
-          console.error("Ошибка при обновлении прогресса:", error);
+          console.error("Error updating progress:", error);
         }
       };
 
@@ -145,21 +145,21 @@ const MemoGameCore = () => {
             <div className="memory-card-front">
               {flippedPairs.includes(card) || matchedPairs.includes(card.id)
                 ? card.value
-                : "❓"}
+                : "?"}
             </div>
-            <div className="memory-card-back">❓</div>
+            <div className="memory-card-back">?</div>
           </div>
         ))}
       </div>
-      {/* 🎉 Победа и кнопка назад */}
+
       {gameFinished && (
         <div className="text-center my-5">
-          <h2 className="mb-3">🎉 Поздравляем! Урок пройден! 🎉</h2>
+          <h2 className="mb-3">Lesson completed!</h2>
           <Link
             to={`/course/${encodeURIComponent(courseName)}`}
             className="btn btn-success"
           >
-            Назад к урокам
+            Back to lessons
           </Link>
         </div>
       )}

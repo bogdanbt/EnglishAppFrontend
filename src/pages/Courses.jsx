@@ -7,6 +7,7 @@ const Courses = () => {
   const { user } = useContext(AuthContext);
   const [courses, setCourses] = useState([]);
   const navigate = useNavigate();
+
   useEffect(() => {
     if (!user || !user.id) return;
 
@@ -15,7 +16,7 @@ const Courses = () => {
         const response = await API.get(`/courses/${user.id}`);
         setCourses(response.data.courses);
       } catch (error) {
-        console.error("Ошибка загрузки курсов:", error);
+        console.error("Failed to load courses:", error);
       }
     };
 
@@ -24,24 +25,23 @@ const Courses = () => {
 
   return (
     <div className="container mt-5">
-      <h2 className="text-center">Ваши курсы</h2>
+      <h2 className="text-center">Your Courses</h2>
+
       <div className="text-center my-4">
         <button
           className="btn btn-primary btn-lg"
           onClick={() => navigate("/import-vocabulary")}
         >
-          📦 Import
+          Import
         </button>
       </div>
+
       {courses.length === 0 ? (
         <div className="text-center mt-4">
           <p>
-            У вас пока нет загруженных курсов. загрузите слова через нашу
-            функцию импорт
+            You don't have any courses yet. Use the import function to upload
+            vocabulary.
           </p>
-          {/* <Link to="/settings" className="btn btn-primary">
-            Настройки
-          </Link> */}
         </div>
       ) : (
         <div className="row">
@@ -53,7 +53,7 @@ const Courses = () => {
                   to={`/course/${encodeURIComponent(course)}`}
                   className="btn btn-outline-primary mt-2"
                 >
-                  Перейти
+                  Open
                 </Link>
               </div>
             </div>

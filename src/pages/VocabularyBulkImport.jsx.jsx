@@ -31,7 +31,7 @@ const VocabularyBulkImport = () => {
       if (!course || !lesson || !word || !translation) {
         previewTable.push({
           row,
-          status: "❌ пропущено (недостаточно данных)",
+          status: "Skipped (missing fields)",
         });
         return;
       }
@@ -46,7 +46,7 @@ const VocabularyBulkImport = () => {
       };
 
       objects.push(obj);
-      previewTable.push({ row, status: "✅ готово" });
+      previewTable.push({ row, status: "Ready" });
     });
 
     setParsedWords(objects);
@@ -55,90 +55,92 @@ const VocabularyBulkImport = () => {
 
   const handleImport = async () => {
     if (parsedWords.length === 0 && rawData.trim()) {
-      alert("Сначала нажмите 'Предпросмотр', чтобы подготовить данные.");
+      alert("Click 'Preview' first to prepare the data.");
       return;
     }
 
     if (parsedWords.length === 0) {
-      alert("Нет данных для импорта.");
+      alert("No data to import.");
       return;
     }
 
     try {
       const res = await API.post("/words", parsedWords);
-      alert(`✅ Импортировано ${res.data.inserted.length} слов`);
+      alert(`Imported ${res.data.inserted.length} words successfully.`);
       setRawData("");
       setParsedWords([]);
       setPreview([]);
     } catch (err) {
-      console.error("Ошибка при импорте слов:", err);
-      alert("Ошибка при импорте");
+      console.error("Import error:", err);
+      alert("Error during import.");
     }
   };
 
   return (
     <div className="container mt-5">
-      <h2>Импорт слов (расширенный режим)</h2>
+      <h2>Vocabulary Import (Advanced Mode)</h2>
 
       <p className="alert alert-light">
-        <strong>Ожидаемый формат:</strong>
+        <strong>Expected format:</strong>
         <br />
-        <code>Курс / Урок / Слово / Перевод</code>
+        <code>Course / Lesson / Word / Translation</code>
         <br />
-        <em>Пример:</em>
+        <em>Example:</em>
         <br />
         <code>A2 / School / apple / яблоко</code>
       </p>
 
       <div className="row my-3">
         <div className="col-md-6">
-          <label>Разделитель колонок:</label>
+          <label>Column delimiter:</label>
           <input
             className="form-control"
             value={colDelimiter}
             onChange={(e) => setColDelimiter(e.target.value)}
-            placeholder="например: / или ,"
+            placeholder="e.g., / or ,"
           />
         </div>
         <div className="col-md-6">
-          <label>Разделитель строк:</label>
+          <label>Row delimiter:</label>
           <input
             className="form-control"
             value={rowDelimiter}
             onChange={(e) => setRowDelimiter(e.target.value)}
-            placeholder="например: \n или ;"
+            placeholder="e.g., \\n or ;"
           />
         </div>
       </div>
 
-      <label>Вставьте данные:</label>
+      <label>Paste your data:</label>
       <textarea
         className="form-control"
         rows={10}
-        placeholder="Вставьте строки в формате: курс / урок / слово / перевод"
+        placeholder="Paste lines in format: course / lesson / word / translation"
         value={rawData}
         onChange={(e) => setRawData(e.target.value)}
       />
 
       <div className="mt-3 d-flex gap-2">
         <button className="btn btn-primary" onClick={parseData}>
-          🔍 Предпросмотр
+          Preview
         </button>
         <button className="btn btn-success" onClick={handleImport}>
-          📥 Импортировать
+          Import
         </button>
       </div>
 
       {preview.length > 0 && (
         <div className="mt-4">
-          <h5>Результат разбора:</h5>
+          <h5>Parsing Result:</h5>
           <ul>
             {preview.map((item, i) => (
               <li key={i}>
                 <code>{item.row}</code> —{" "}
                 <strong
                   style={{
-                    color: item.status.includes("❌") ? "crimson" : "green",
+                    color: item.status.toLowerCase().includes("skipped")
+                      ? "crimson"
+                      : "green",
                   }}
                 >
                   {item.status}
