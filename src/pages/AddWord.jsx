@@ -28,7 +28,7 @@ const AddWord = () => {
         const res = await API.get(`/courses/${user.id}`);
         setCourses(res.data.courses);
       } catch (err) {
-        console.error("Ошибка загрузки курсов", err);
+        console.error("Failed to load courses", err);
       }
     };
 
@@ -45,7 +45,7 @@ const AddWord = () => {
         );
         setLessons(res.data.lessons);
       } catch (err) {
-        console.error("Ошибка загрузки уроков", err);
+        console.error("Failed to load lessons", err);
       }
     };
 
@@ -64,23 +64,23 @@ const AddWord = () => {
         translation,
       });
 
-      alert("Слово добавлено успешно!");
+      alert("Word added successfully!");
 
       setWord("");
       setTranslation("");
     } catch (err) {
-      console.error("Ошибка при добавлении слова", err);
-      alert("Ошибка при добавлении слова");
+      console.error("Error adding word", err);
+      alert("Error adding word");
     }
   };
 
   return (
     <div className="container mt-5" style={{ maxWidth: "600px" }}>
-      <h3 className="mb-4">Добавить новое слово</h3>
+      <h3 className="mb-4">Add New Word</h3>
       <form onSubmit={handleSubmit}>
-        {/* Выбор или создание курса */}
+        {/* Select or create a course */}
         <div className="mb-3">
-          <label className="form-label">Курс:</label>
+          <label className="form-label">Course:</label>
           <select
             className="form-select"
             value={selectedCourse}
@@ -92,7 +92,7 @@ const AddWord = () => {
             }}
             disabled={!!customCourse}
           >
-            <option value="">-- Выбери курс --</option>
+            <option value="">-- Select a course --</option>
             {courses.map((course, i) => (
               <option key={i} value={course}>
                 {course}
@@ -102,7 +102,7 @@ const AddWord = () => {
           <input
             type="text"
             className="form-control mt-2"
-            placeholder="или введи новый курс"
+            placeholder="or enter a new course"
             value={customCourse}
             onChange={(e) => {
               setCustomCourse(e.target.value);
@@ -113,9 +113,9 @@ const AddWord = () => {
           />
         </div>
 
-        {/* Выбор или создание урока */}
+        {/* Select or create a lesson */}
         <div className="mb-3">
-          <label className="form-label">Урок:</label>
+          <label className="form-label">Lesson:</label>
           <select
             className="form-select"
             value={selectedLesson}
@@ -123,9 +123,9 @@ const AddWord = () => {
               setSelectedLesson(e.target.value);
               setCustomLesson("");
             }}
-            disabled={!!customLesson || !actualCourse}
+            disabled={!actualCourse || !!customLesson}
           >
-            <option value="">-- Выбери урок --</option>
+            <option value="">-- Select a lesson --</option>
             {lessons.map((lesson, i) => (
               <option key={i} value={lesson}>
                 {lesson}
@@ -135,7 +135,7 @@ const AddWord = () => {
           <input
             type="text"
             className="form-control mt-2"
-            placeholder="или введи новый урок"
+            placeholder="or enter a new lesson"
             value={customLesson}
             onChange={(e) => {
               setCustomLesson(e.target.value);
@@ -145,9 +145,9 @@ const AddWord = () => {
           />
         </div>
 
-        {/* Слово и перевод */}
+        {/* Word and translation */}
         <div className="mb-3">
-          <label className="form-label">Слово:</label>
+          <label className="form-label">Word:</label>
           <input
             type="text"
             className="form-control"
@@ -158,7 +158,7 @@ const AddWord = () => {
         </div>
 
         <div className="mb-4">
-          <label className="form-label">Перевод:</label>
+          <label className="form-label">Translation:</label>
           <input
             type="text"
             className="form-control"
@@ -173,7 +173,7 @@ const AddWord = () => {
           className="btn btn-success w-100"
           disabled={!actualCourse || !actualLesson || !word || !translation}
         >
-          Добавить слово
+          Add Word
         </button>
       </form>
     </div>

@@ -23,13 +23,13 @@ import GrammarManualImport from "./pages/GrammarManualImport";
 import GrammarBulkImport from "./pages/GrammarBulkImport";
 import VocabularyBulkImport from "./pages/VocabularyBulkImport.jsx";
 import VocabularyManualImport from "./pages/VocabularyManualImport.jsx";
-
+import "./index.css"
 const App = () => {
   return (
     <AuthProvider>
       <Router>
         <Navbar />
-        <div className="container mt-4">
+        <div className="container-fluid m-0 p-0">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />

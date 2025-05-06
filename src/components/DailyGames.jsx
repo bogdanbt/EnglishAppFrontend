@@ -5,17 +5,15 @@ import API from "../utils/api";
 import PuzzleGameCore from "./PuzzleGameCore";
 import TextGameCore from "./TextGameCore";
 // import WordAssociations from "./WordAssociations";
-// import CONFIG from "../config";
 import "./WordIntervalPuzzle.css";
 import TranslationGame from "./TranslationGame";
+
 const DailyGames = () => {
-  // const { lesson } = useParams();
   const { user } = useContext(AuthContext);
   const { courseName, lessonName } = useParams();
   const decodedCourseName = decodeURIComponent(courseName);
   const decodedLessonName = decodeURIComponent(lessonName);
 
-  //
   const [wordList, setWordList] = useState([]);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [currentGameType, setCurrentGameType] = useState("text"); // "text", "association", "puzzle"
@@ -35,8 +33,8 @@ const DailyGames = () => {
         setWordList(response.data);
         setLoading(false);
       } catch (err) {
-        console.error("Ошибка при загрузке слов:", err);
-        setError("Не удалось загрузить слова.");
+        console.error("Error loading words:", err);
+        setError("Failed to load words.");
         setLoading(false);
       }
     };
@@ -45,36 +43,36 @@ const DailyGames = () => {
   }, [user, decodedCourseName, decodedLessonName]);
 
   const handleNextGame = () => {
-    console.log("Переход к следующей игре");
+    console.log("Proceeding to the next game");
 
-    // Логика перехода к следующей игре
+    // Game switch logic
     if (isSecondRound) {
-      // Если мы уже во втором раунде (PuzzleGameCore), просто перейдем к следующему слову
+      // If we're in the second round (PuzzleGameCore), just go to the next word
       const nextWordIndex = currentWordIndex + 1;
 
       if (nextWordIndex >= wordList.length) {
-        // Если все слова пройдены во втором раунде, игра завершена
+        // If all words are done in the second round, the game is complete
         setGameCompleted(true);
-        console.log("🏁 Все слова пройдены!");
+        console.log("🏁 All words completed!");
         return;
       }
 
       setCurrentWordIndex(nextWordIndex);
     } else {
-      // Если мы в первом раунде (TextGameCore -> WordAssociations)
+      // First round (TextGameCore -> WordAssociations)
       if (currentGameType === "text") {
-        // Переключаемся с TextGameCore на WordAssociations для того же слова
+        // Switch from TextGameCore to WordAssociations for the same word
         setCurrentGameType("association");
       } else {
-        // Переключаемся с WordAssociations на TextGameCore следующего слова
+        // Switch from WordAssociations to the next word's TextGameCore
         const nextWordIndex = currentWordIndex + 1;
 
         if (nextWordIndex >= wordList.length) {
-          // Если все слова пройдены в первом раунде, переходим ко второму раунду
+          // All words finished in the first round, start second round
           setIsSecondRound(true);
           setCurrentWordIndex(0);
         } else {
-          // Иначе переходим к следующему слову
+          // Otherwise go to next word
           setCurrentWordIndex(nextWordIndex);
           setCurrentGameType("text");
         }
@@ -82,22 +80,21 @@ const DailyGames = () => {
     }
   };
 
-  if (loading) return <p>Загрузка...</p>;
+  if (loading) return <p>Loading...</p>;
   if (error) return <p className="alert alert-danger">{error}</p>;
-  if (wordList.length === 0) return <p>Нет доступных слов для этого урока.</p>;
-  if (gameCompleted)
-    return <p>Поздравляем! Вы завершили изучение всех слов!</p>;
+  if (wordList.length === 0) return <p>No available words for this lesson.</p>;
+  if (gameCompleted) return <p>Congratulations! You have completed all words!</p>;
 
   const currentWord = wordList[currentWordIndex];
 
   if (!currentWord) {
-    return <p>Произошла ошибка при загрузке слова.</p>;
+    return <p>An error occurred while loading the word.</p>;
   }
 
-  // Логика отображения текущей игры
+  // Game rendering logic
   if (isSecondRound) {
     console.log(
-      "🎮 Второй раунд: PuzzleGameCore для слова:",
+      "🎮 Round 2: PuzzleGameCore for word:",
       currentWord.word,
       `(${currentWordIndex + 1}/${wordList.length})`
     );
@@ -112,7 +109,7 @@ const DailyGames = () => {
   } else {
     if (currentGameType === "text") {
       console.log(
-        "🎮 Первый раунд (1/2): TextGameCore для слова:",
+        "🎮 Round 1 (1/2): TextGameCore for word:",
         currentWord.word,
         `(${currentWordIndex + 1}/${wordList.length})`
       );
@@ -120,13 +117,13 @@ const DailyGames = () => {
       return (
         <TextGameCore
           word={currentWord.word}
-          occurrences={0} // Можно использовать для совместимости с предыдущим кодом
+          occurrences={0} // Compatibility value
           onNext={handleNextGame}
         />
       );
     } else {
       console.log(
-        "🎮 Первый раунд (2/2): WordAssociations для слова:",
+        "🎮 Round 1 (2/2): WordAssociations for word:",
         currentWord.word,
         `(${currentWordIndex + 1}/${wordList.length})`
       );
@@ -134,7 +131,7 @@ const DailyGames = () => {
       return (
         <PuzzleGameCore
           wordData={currentWord}
-          occurrences={2} // Можно использовать для совместимости с предыдущим кодом
+          occurrences={2} // Compatibility value
           onNext={handleNextGame}
         />
 
@@ -142,7 +139,7 @@ const DailyGames = () => {
         //   word={currentWord.word}
         //   email="bt.tarasenko@gmail.com"
         //   lesson={lesson}
-        //   occurrences={1} // Можно использовать для совместимости с предыдущим кодом
+        //   occurrences={1}
         //   onNext={handleNextGame}
         // />
       );

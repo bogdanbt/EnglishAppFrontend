@@ -13,9 +13,12 @@
 
 .shuffled-letters {
   display: flex;
-  flex-wrap: wrap; /* Позволяет кнопкам переноситься на новую строку */
-  justify-content: center; /* Центрирует кнопки */
-  gap: 10px; /* Отступы между кнопками */
+  flex-wrap: wrap;
+
+  justify-content: center; 
+
+  gap: 10px; 
+
   margin-bottom: 20px;
 }
 .letter-button {

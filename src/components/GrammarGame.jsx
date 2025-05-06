@@ -28,7 +28,7 @@ const GrammarGame = () => {
         );
         setSentences(response.data);
       } catch (error) {
-        console.error("Ошибка загрузки предложений:", error);
+        console.error("Error loading sentence:", error);
       }
     };
 
@@ -60,7 +60,7 @@ const GrammarGame = () => {
     if (updated.length === correctWords.length) {
       const isCorrect =
         updated.map((w) => w.text).join(" ") === sentences[currentIndex].sentenceGrammar;
-      setFeedback(isCorrect ? "✅ Верно!" : "❌ Ошибка!");
+      setFeedback(isCorrect ? "✅ Correct!" : "❌ Mistake!");
 
       if (isCorrect) {
         setTimeout(async () => {
@@ -72,7 +72,7 @@ const GrammarGame = () => {
                 lessonGrammarName: decodedLessonName,
               });
             } catch (err) {
-              console.error("Ошибка при обновлении прогресса:", err);
+              console.error("Restart error:", err);
             }
 
             navigate(`/grammar-course/${encodeURIComponent(courseGrammarName)}`);
@@ -98,13 +98,13 @@ const GrammarGame = () => {
     setFeedback(null);
   };
 
-  if (sentences.length === 0) return <p className="text-center">Загрузка...</p>;
+  if (sentences.length === 0) return <p className="text-center">Loading...</p>;
 
   const current = sentences[currentIndex];
 
   return (
     <div className="container mt-5">
-      <h4 className="text-center mb-4">Перевод: {current.translation}</h4>
+      <h4 className="text-center mb-4">Translation: {current.translation}</h4>
 
       <div className="d-flex flex-wrap justify-content-center mb-3">
         {pieces
@@ -121,12 +121,12 @@ const GrammarGame = () => {
       </div>
 
       <div className="text-center mb-3">
-        <strong>Ваш ответ:</strong> {selected.map((w) => w.text).join(" ")}
+        <strong>You answer:</strong> {selected.map((w) => w.text).join(" ")}
       </div>
 
       <div className="text-center">
         <button className="btn btn-warning me-2" onClick={resetSentence}>
-          🔄 Начать заново
+          Restart
         </button>
       </div>
 

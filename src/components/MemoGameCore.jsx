@@ -7,9 +7,9 @@ import CONFIG from "../config";
 const MemoGameCore = () => {
   const { lesson } = useParams();
 
-  const [shuffledPairs, setShuffledPairs] = useState([]); // Перемешанные карточки
-  const [flippedPairs, setFlippedPairs] = useState([]); // Открытые карточки
-  const [matchedPairs, setMatchedPairs] = useState([]); // Найденные пары
+  const [shuffledPairs, setShuffledPairs] = useState([]); 
+  const [flippedPairs, setFlippedPairs] = useState([]); 
+  const [matchedPairs, setMatchedPairs] = useState([]); 
 
   useEffect(() => {
     const fetchWords = async () => {
@@ -22,7 +22,7 @@ const MemoGameCore = () => {
         const preparedPairs = cardData.flatMap((card) => [
           {
             id: `${card._id}-word`,
-            baseId: card._id, // Связываем пары через baseId
+            baseId: card._id, 
             type: "word",
             value: card.word,
             audio: `${CONFIG.API_URL}/api/proxy-audio?url=${encodeURIComponent(
@@ -31,7 +31,7 @@ const MemoGameCore = () => {
           },
           {
             id: `${card._id}-translation`,
-            baseId: card._id, // То же baseId для перевода
+            baseId: card._id, 
             type: "translation",
             value: card.translation,
           },

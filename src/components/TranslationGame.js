@@ -8,13 +8,11 @@ const TranslationGame = ({ word, translation, onNext }) => {
   const inputRef = useRef(null);
 
   useEffect(() => {
-    // Устанавливаем фокус на поле ввода при загрузке компонента
     inputRef.current?.focus();
   }, []);
 
   const handleInputChange = (e) => {
     setUserInput(e.target.value);
-    // Сбрасываем сообщение при изменении ввода
     setMessage("");
   };
 
@@ -24,20 +22,19 @@ const TranslationGame = ({ word, translation, onNext }) => {
 
     if (normalizedInput === normalizedWord) {
       setIsCorrect(true);
-      setMessage("Правильно! Отлично!");
-      // Даем пользователю небольшую задержку чтобы увидеть сообщение о правильном ответе
+      setMessage("Correct!");
       setTimeout(() => {
         onNext();
       }, 1500);
     } else {
-      setMessage("Неверно. Попробуйте еще раз.");
+      setMessage("Try again");
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (userInput.trim() === "") {
-      setMessage("Пожалуйста, введите слово");
+      setMessage("Please enter a word");
       return;
     }
     checkAnswer();
@@ -49,7 +46,7 @@ const TranslationGame = ({ word, translation, onNext }) => {
 
   const handleSkip = () => {
     setIsCorrect(true);
-    setMessage("Слово пропущено. Правильный ответ: " + word);
+    setMessage("Skipped. The correct answer is: " + word);
     setTimeout(() => {
       onNext();
     }, 2000);
@@ -57,16 +54,16 @@ const TranslationGame = ({ word, translation, onNext }) => {
 
   return (
     <div className="translation-game p-4 max-w-md mx-auto bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-center">Переведите слово</h2>
+      <h2 className="text-2xl font-bold mb-6 text-center">Translate the Word</h2>
 
       <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-        <h3 className="text-lg font-medium mb-2">Перевод:</h3>
+        <h3 className="text-lg font-medium mb-2">Translation:</h3>
         <p className="text-xl">{translation}</p>
       </div>
 
       {showHint && (
         <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <h3 className="text-md font-medium mb-1">Подсказка:</h3>
+          <h3 className="text-md font-medium mb-1">Hint:</h3>
           <p className="text-lg">{word}</p>
         </div>
       )}
@@ -74,7 +71,7 @@ const TranslationGame = ({ word, translation, onNext }) => {
       <form onSubmit={handleSubmit} className="mb-4">
         <div className="mb-4">
           <label htmlFor="wordInput" className="block mb-2 font-medium">
-            Введите слово:
+            Enter the word:
           </label>
           <input
             ref={inputRef}
@@ -83,13 +80,13 @@ const TranslationGame = ({ word, translation, onNext }) => {
             value={userInput}
             onChange={handleInputChange}
             className={`w-full p-2 border rounded-md ${
-              message === "Правильно! Отлично!"
+              message === "Correct!"
                 ? "border-green-500"
-                : message === "Неверно. Попробуйте еще раз."
+                : message === "Try again" || message.startsWith("Skipped")
                 ? "border-red-500"
                 : "border-gray-300"
             }`}
-            placeholder="Введите ответ"
+            placeholder="Your answer"
             disabled={isCorrect}
           />
         </div>
@@ -97,9 +94,9 @@ const TranslationGame = ({ word, translation, onNext }) => {
         {message && (
           <div
             className={`mb-4 p-2 rounded-md ${
-              message === "Правильно! Отлично!"
+              message === "Correct!"
                 ? "bg-green-100 text-green-700"
-                : message === "Неверно. Попробуйте еще раз."
+                : message === "Try again" || message.startsWith("Skipped")
                 ? "bg-red-100 text-red-700"
                 : "bg-blue-100 text-blue-700"
             }`}
@@ -114,7 +111,7 @@ const TranslationGame = ({ word, translation, onNext }) => {
             className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md flex-1"
             disabled={isCorrect}
           >
-            Проверить
+            Check
           </button>
 
           {!showHint && !isCorrect && (
@@ -123,7 +120,7 @@ const TranslationGame = ({ word, translation, onNext }) => {
               onClick={showWordHint}
               className="bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-md"
             >
-              Подсказка
+              Hint
             </button>
           )}
 
@@ -133,7 +130,7 @@ const TranslationGame = ({ word, translation, onNext }) => {
               onClick={handleSkip}
               className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-md"
             >
-              Пропустить
+              Skip
             </button>
           )}
         </div>

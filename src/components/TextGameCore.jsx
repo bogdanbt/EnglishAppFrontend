@@ -15,17 +15,17 @@ const TextGameCore = ({ word, onNext }) => {
   const [completed, setCompleted] = useState(false);
   const [renderNumber, setRenderNumber] = useState(1);
 
-  // Наблюдаем за завершением всех примеров и вызываем onNext
+
   useEffect(() => {
     if (isCorrect && isCorrect2 && isCorrect3 && renderNumber >= 13) {
       const timer = setTimeout(() => {
         setCompleted(true);
         if (onNext) {
-          onNext(); // Вызываем onNext для перехода к следующему слову/игре
+          onNext(); 
         }
-      }, 1500); // Задержка в 1.5 секунды
+      }, 1500); 
 
-      return () => clearTimeout(timer); // Очистка таймера при размонтировании
+      return () => clearTimeout(timer); 
     }
   }, [isCorrect, isCorrect2, isCorrect3, renderNumber, onNext]);
 
@@ -51,7 +51,7 @@ const TextGameCore = ({ word, onNext }) => {
         );
 
         if (!translationResponse.ok)
-          throw new Error(`Ошибка перевода: ${translationResponse.status}`);
+          throw new Error(`Error translate: ${translationResponse.status}`);
 
         const translationData = await translationResponse.json();
         const topTranslations = (translationData[0]?.translations || [])
@@ -60,7 +60,7 @@ const TextGameCore = ({ word, onNext }) => {
           .map((t) => t.normalizedTarget);
 
         if (topTranslations.length === 0) {
-          setError("Переводы не найдены.");
+          setError("Translates not found.");
           setLoading(false);
           return;
         }
@@ -93,13 +93,13 @@ const TextGameCore = ({ word, onNext }) => {
           .slice(0, 3);
 
         if (allExamples.length === 0) {
-          setError("Примеры использования не найдены.");
+          setError("sentence  not found");
         } else {
           setExamples(allExamples);
         }
       } catch (err) {
-        console.error("Ошибка при получении примеров:", err);
-        setError("Не удалось загрузить примеры.");
+        console.error("sentence not loading", err);
+        setError("sentence not loading.");
       } finally {
         setLoading(false);
       }
@@ -108,12 +108,13 @@ const TextGameCore = ({ word, onNext }) => {
     fetchUsageExamples();
   }, [word]);
 
-  if (loading) return <div>Загрузка примеров...</div>;
-  if (error) return <div>Ошибка: {error}</div>;
-  if (completed) return <div>🎉 Поздравляем! Вы собрали все предложения.</div>;
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+  if (completed) return <div>🎉 Congratulations.</div>;
 
-  // Для отладки: отображение кнопки, чтобы проверить работу onNext
-  const debugMode = false; // Установите в true для тестирования
+
+  const debugMode = false; 
+
 
   return (
     <>
@@ -159,10 +160,10 @@ const TextGameCore = ({ word, onNext }) => {
                         value.trim().toLowerCase() ===
                         examples[0]?.sourceTerm.toLowerCase()
                       ) {
-                        setIsCorrect(true); // ✅ Отмечаем как правильный ввод
-                        setRenderNumber(4); // ✅ Переходим к следующему шагу
+                        setIsCorrect(true); 
+                        setRenderNumber(4);
                       } else {
-                        setIsCorrect(false); // ⛔ Отмечаем как неправильный, если не совпадает
+                        setIsCorrect(false); 
                       }
                     }}
                     autoFocus
@@ -173,10 +174,10 @@ const TextGameCore = ({ word, onNext }) => {
               </form>
               {currentExampleIndex === 0 && !isCorrect && userInput && (
                 <small className="text-danger">
-                  ⛔ Неверно, попробуйте ещё раз.
+                  Try again
                 </small>
               )}
-              {isCorrect && <small className="text-success">✅ Верно!</small>}
+              {isCorrect && <small className="text-success">✅ Correct!</small>}
             </div>
           )}
 
@@ -222,10 +223,10 @@ const TextGameCore = ({ word, onNext }) => {
                         value.trim().toLowerCase() ===
                         examples[1]?.sourceTerm.toLowerCase()
                       ) {
-                        setIsCorrect2(true); // ✅ Отмечаем как правильный ввод
-                        setRenderNumber(8); // ✅ Переходим к следующему шагу
+                        setIsCorrect2(true); 
+                        setRenderNumber(8);
                       } else {
-                        setIsCorrect2(false); // ⛔ Отмечаем как неправильный, если не совпадает
+                        setIsCorrect2(false); 
                       }
                     }}
                     autoFocus
@@ -236,10 +237,10 @@ const TextGameCore = ({ word, onNext }) => {
               </form>
               {currentExampleIndex === 0 && !isCorrect2 && userInput2 && (
                 <small className="text-danger">
-                  ⛔ Неверно, попробуйте ещё раз.
+                  Try again
                 </small>
               )}
-              {isCorrect2 && <small className="text-success">✅ Верно!</small>}
+              {isCorrect2 && <small className="text-success">✅ Correct!</small>}
             </div>
           )}
 
@@ -285,10 +286,10 @@ const TextGameCore = ({ word, onNext }) => {
                         value.trim().toLowerCase() ===
                         examples[2]?.sourceTerm.toLowerCase()
                       ) {
-                        setIsCorrect3(true); // ✅ Отмечаем как правильный ввод
-                        setRenderNumber(12); // ✅ Переходим к следующему шагу
+                        setIsCorrect3(true); 
+                        setRenderNumber(12); 
                       } else {
-                        setIsCorrect3(false); // ⛔ Отмечаем как неправильный, если не совпадает
+                        setIsCorrect3(false); 
                       }
                     }}
                     autoFocus
@@ -299,10 +300,10 @@ const TextGameCore = ({ word, onNext }) => {
               </form>
               {currentExampleIndex === 0 && !isCorrect3 && userInput3 && (
                 <small className="text-danger">
-                  ⛔ Неверно, попробуйте ещё раз.
+Try again
                 </small>
               )}
-              {isCorrect3 && <small className="text-success">✅ Верно!</small>}
+              {isCorrect3 && <small className="text-success">✅ Correct!</small>}
             </div>
           )}
 
@@ -316,8 +317,8 @@ const TextGameCore = ({ word, onNext }) => {
 
       {renderNumber >= 13 && isCorrect && isCorrect2 && isCorrect3 && (
         <div className="mt-3 alert alert-success">
-          Отлично! Все примеры собраны правильно. Переходим к следующему
-          слову...
+          
+Next Word
         </div>
       )}
     </>
