@@ -83,7 +83,8 @@ const DailyGames = () => {
   if (loading) return <p>Loading...</p>;
   if (error) return <p className="alert alert-danger">{error}</p>;
   if (wordList.length === 0) return <p>No available words for this lesson.</p>;
-  if (gameCompleted) return <p>Congratulations! You have completed all words!</p>;
+  if (gameCompleted)
+    return <p>Congratulations! You have completed all words!</p>;
 
   const currentWord = wordList[currentWordIndex];
 

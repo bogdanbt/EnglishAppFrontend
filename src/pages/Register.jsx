@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import CONFIG from "../config";
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -12,14 +13,15 @@ const Register = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post("https://englishappbackend.onrender.com/auth/register", {
+      await axios.post(`${CONFIG.API_BASE_URL}/auth/register`, {
         email,
         password,
       });
       alert("Registration successful! You can now log in.");
       navigate("/login");
     } catch (error) {
-      alert("Error registering");
+      alert("Error registering. Please try again.");
+      console.error("Registration error:", error);
     } finally {
       setLoading(false);
     }
@@ -29,7 +31,7 @@ const Register = () => {
     return (
       <div
         className="d-flex justify-content-center align-items-center"
-        style={{ height: "70vh" }}
+        style={{ height: "100vh", backgroundColor: "#FFE4EC" }}
       >
         <div
           className="spinner-border text-success"
@@ -41,32 +43,60 @@ const Register = () => {
       </div>
     );
   }
+
   return (
-    <div>
-      <h2>Register</h2>
-      <form onSubmit={handleRegister}>
-        <div className="mb-3">
-          <label>Email</label>
-          <input
-            type="email"
-            className="form-control"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div className="mb-3">
-          <label>Password</label>
-          <input
-            type="password"
-            className="form-control"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        <button className="btn btn-success">Register</button>
-      </form>
+    <div
+      style={{
+        minHeight: "100vh",
+        backgroundColor: "#FFE4EC",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "2rem",
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: "#ffffff",
+          borderRadius: "20px",
+          padding: "3rem",
+          maxWidth: "500px",
+          width: "100%",
+          boxShadow: "0 8px 30px rgba(0, 0, 0, 0.08)",
+        }}
+      >
+        <h2 className="mb-4 text-center" style={{ color: "#FF6D7A" }}>
+          Register at Vocally
+        </h2>
+        <form onSubmit={handleRegister}>
+          <div className="mb-3">
+            <label>Email</label>
+            <input
+              type="email"
+              className="form-control"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              required
+              autoFocus
+            />
+          </div>
+          <div className="mb-4">
+            <label>Password</label>
+            <input
+              type="password"
+              className="form-control"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              required
+            />
+          </div>
+          <button type="submit" className="btn btn-success w-100">
+            Create Account
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

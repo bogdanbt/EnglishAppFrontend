@@ -9,73 +9,108 @@ const GrammarLesson = () => {
   const decodedCourseName = decodeURIComponent(courseGrammarName);
   const decodedLessonName = decodeURIComponent(lessonGrammarName);
   const navigate = useNavigate();
+
   const [sentences, setSentences] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch sentences
+  const fetchSentences = async () => {
+    try {
+      const response = await API.get(
+        `/grammar/${user.id}/${decodedCourseName}/${decodedLessonName}`
+      );
+      setSentences(response.data);
+    } catch (error) {
+      console.error("Error loading grammar sentences:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!user || !user.id) return;
-
-    const fetchSentences = async () => {
-      try {
-        const response = await API.get(
-          `/grammar/${user.id}/${decodedCourseName}/${decodedLessonName}`
-        );
-        setSentences(response.data);
-      } catch (error) {
-        console.error("Error loading grammar sentences:", error);
-      }
-    };
-
     fetchSentences();
   }, [user, decodedCourseName, decodedLessonName]);
 
+  // Edit sentence
+  const handleEdit = async (item) => {
+    const newSentence = prompt("New English sentence:", item.sentenceGrammar);
+    const newTranslation = prompt("New translation:", item.translation);
+    if (newSentence && newTranslation) {
+      try {
+        await API.put(`/grammar/${item._id}`, {
+          sentenceGrammar: newSentence,
+          translation: newTranslation,
+        });
+        fetchSentences(); // update without reload
+      } catch (err) {
+        console.error("Edit error:", err);
+      }
+    }
+  };
+
+  // Reset progress
+  const resetProgress = async () => {
+    try {
+      await API.put("/grammar-progress", {
+        userId: user.id,
+        courseGrammarName: decodedCourseName,
+        lessonGrammarName: decodedLessonName,
+        repeats: 0,
+      });
+      alert("Progress reset.");
+    } catch (err) {
+      console.error("Reset error:", err);
+    }
+  };
+
+  // Delete lesson
+  const deleteLesson = async () => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete the entire lesson?"
+    );
+    if (!confirmed) return;
+    try {
+      await API.delete(
+        `/grammar/${user.id}/${decodedCourseName}/${decodedLessonName}`
+      );
+      alert("Lesson deleted.");
+      navigate(`/grammar-course/${courseGrammarName}`);
+    } catch (err) {
+      console.error("Delete error:", err);
+    }
+  };
+
   return (
     <div className="container mt-5">
-      <h2 className="text-center">Lesson: {decodedLessonName}</h2>
+      <h2 className="text-center mb-4">Lesson: {decodedLessonName}</h2>
 
-      {sentences.length === 0 ? (
-        <p className="text-center mt-4">No sentences in this lesson yet.</p>
+      {loading ? (
+        <p className="text-center">Loading...</p>
+      ) : sentences.length === 0 ? (
+        <p className="text-center">No sentences in this lesson yet.</p>
       ) : (
         <>
           <div className="list-group mb-4">
             {sentences.map((item, index) => (
-              <div
-                key={index}
-                className="list-group-item d-flex flex-column align-items-start"
-              >
-                <strong>Translation:</strong> {item.translation}
-                <span className="text-muted mt-1">
-                  Sentence: {item.sentenceGrammar}
-                </span>
-                <div className="mt-2">
-                  <button
-                    className="btn btn-sm btn-outline-primary me-2"
-                    onClick={() => {
-                      const newSentence = prompt(
-                        "New English sentence:",
-                        item.sentenceGrammar
-                      );
-                      const newTranslation = prompt(
-                        "New translation:",
-                        item.translation
-                      );
-                      if (newSentence && newTranslation) {
-                        API.put(`/grammar/${item._id}`, {
-                          sentenceGrammar: newSentence,
-                          translation: newTranslation,
-                        })
-                          .then(() => window.location.reload())
-                          .catch((err) => console.error("Edit error:", err));
-                      }
-                    }}
-                  >
-                    Edit
-                  </button>
+              <div key={index} className="custom-sentence-card">
+                <div className="mb-2">
+                  <strong>Translation:</strong> {item.translation}
                 </div>
+                <div className="text-muted mb-2">
+                  <strong>Sentence:</strong> {item.sentenceGrammar}
+                </div>
+                <button
+                  className="btn btn-sm btn-outline-primary"
+                  onClick={() => handleEdit(item)}
+                >
+                  Edit
+                </button>
               </div>
             ))}
           </div>
 
-          <div className="text-center">
+          <div className="text-center mb-3">
             <Link
               to={`/grammar-course/${encodeURIComponent(
                 courseGrammarName
@@ -86,46 +121,14 @@ const GrammarLesson = () => {
             </Link>
           </div>
 
-          <button
-            className="btn btn-outline-danger mt-3"
-            onClick={async () => {
-              try {
-                await API.put("/grammar-progress", {
-                  userId: user.id,
-                  courseGrammarName: decodedCourseName,
-                  lessonGrammarName: decodedLessonName,
-                  repeats: 0,
-                });
-                alert("Progress reset.");
-              } catch (err) {
-                console.error("Reset error:", err);
-              }
-            }}
-          >
-            Reset Progress
-          </button>
-
-          <div className="text-center mt-4">
+          <div className="text-center">
             <button
-              className="btn btn-danger"
-              onClick={async () => {
-                if (
-                  window.confirm(
-                    "Are you sure you want to delete the entire lesson?"
-                  )
-                ) {
-                  try {
-                    await API.delete(
-                      `/grammar/${user.id}/${decodedCourseName}/${decodedLessonName}`
-                    );
-                    alert("Lesson deleted.");
-                    navigate(`/grammar-course/${courseGrammarName}`);
-                  } catch (err) {
-                    console.error("Delete error:", err);
-                  }
-                }
-              }}
+              className="btn btn-outline-danger me-2"
+              onClick={resetProgress}
             >
+              Reset Progress
+            </button>
+            <button className="btn btn-danger" onClick={deleteLesson}>
               Delete Entire Lesson
             </button>
           </div>

@@ -4,16 +4,14 @@ import { AuthProvider } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/Home";
-import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Settings from "./pages/Settings";
+
 import Courses from "./pages/Courses";
 import CourseLessons from "./pages/CourseLessons";
 import Lesson from "./pages/Lesson";
-import GameMemoCard from "./pages/GameMemoCard";
 import GamePuzzle from "./pages/GamePuzzle";
-import AddWord from "./pages/AddWord";
+
 import DailyGames from "./components/DailyGames";
 import GrammarCourses from "./pages/GrammarCourses";
 import GrammarCourseLessons from "./pages/GrammarCourseLessons";
@@ -23,7 +21,9 @@ import GrammarManualImport from "./pages/GrammarManualImport";
 import GrammarBulkImport from "./pages/GrammarBulkImport";
 import VocabularyBulkImport from "./pages/VocabularyBulkImport.jsx";
 import VocabularyManualImport from "./pages/VocabularyManualImport.jsx";
-import "./index.css"
+import "./index.css";
+import "./style.css";
+
 const App = () => {
   return (
     <AuthProvider>
@@ -76,14 +76,7 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="/game-memo/course/:courseName/lesson/:lessonName"
-              element={
-                <ProtectedRoute>
-                  <GameMemoCard />
-                </ProtectedRoute>
-              }
-            />
+
             <Route
               path="/daily-games/course/:courseName/lesson/:lessonName"
               element={
@@ -141,14 +134,7 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="/settings"
-              element={
-                <ProtectedRoute>
-                  <Settings />
-                </ProtectedRoute>
-              }
-            />
+
             <Route
               path="/vocabulary"
               element={

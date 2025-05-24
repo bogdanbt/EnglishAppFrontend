@@ -2,6 +2,15 @@ import React, { useEffect, useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import API from "../utils/api";
+import "../styles/Courses.css"; // Add this line
+
+const colorClasses = [
+  "bg-pink",
+  "bg-yellow",
+  "bg-orange",
+  "bg-purple",
+  "bg-light-blue",
+];
 
 const Courses = () => {
   const { user } = useContext(AuthContext);
@@ -44,20 +53,26 @@ const Courses = () => {
           </p>
         </div>
       ) : (
-        <div className="row">
-          {courses.map((course, index) => (
-            <div key={index} className="col-md-4 mb-4">
-              <div className="card p-3 shadow-sm">
-                <h5 className="text-center">{course}</h5>
-                <Link
-                  to={`/course/${encodeURIComponent(course)}`}
-                  className="btn btn-outline-primary mt-2"
-                >
-                  Open
-                </Link>
+        <div className="row justify-content-center">
+          {courses.map((course, index) => {
+            const bg = colorClasses[index % colorClasses.length];
+            return (
+              <div
+                key={index}
+                className="col-12 col-sm-6 col-md-4 mb-4 d-flex justify-content-center"
+              >
+                <div className={`course-card ${bg}`}>
+                  <div className="course-title">{course}</div>
+                  <Link
+                    to={`/course/${encodeURIComponent(course)}`}
+                    className="btn btn-light mt-2"
+                  >
+                    Open
+                  </Link>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

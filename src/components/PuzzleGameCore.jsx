@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useCallback } from "react";
-import "./WordIntervalPuzzle.css"; 
+import "./WordIntervalPuzzle.css";
 
 const PuzzleGameCore = ({ wordData, onNext }) => {
   const [shuffledLetters, setShuffledLetters] = useState([]);
   const [assembledWord, setAssembledWord] = useState([]);
-
 
   const initializeGame = useCallback(() => {
     if (!wordData) return;
@@ -14,7 +13,7 @@ const PuzzleGameCore = ({ wordData, onNext }) => {
 
   useEffect(() => {
     initializeGame();
-  }, [initializeGame]); 
+  }, [initializeGame]);
 
   const handleLetterClick = (letter, index) => {
     setAssembledWord([...assembledWord, letter]);
@@ -24,26 +23,25 @@ const PuzzleGameCore = ({ wordData, onNext }) => {
   const handleReset = () => {
     initializeGame();
   };
-  const playWord = async (word) => {
-    try {
-      const audio = new Audio(
-        `http://localhost:5000/speak/${encodeURIComponent(word)}`
-      );
-      console.log(audio);
-      audio.play();
-      audio.onended = () => {
-        onNext(); 
-      };
-    } catch (error) {
-      console.error("error audio:", error);
-      onNext(); 
-    }
-  };
+  // const playWord = async (word) => {
+  //   try {
+  //     const audio = new Audio(
+  //       `http://localhost:5000/speak/${encodeURIComponent(word)}`
+  //     );
+  //     console.log(audio);
+  //     audio.play();
+  //     audio.onended = () => {
+  //       onNext();
+  //     };
+  //   } catch (error) {
+  //     console.error("error audio:", error);
+  //     onNext();
+  //   }
+  // };
 
   useEffect(() => {
     const isCorrect = assembledWord.join("") === wordData.word;
     if (!isCorrect) return;
-
 
     try {
       const audio = new Audio(
@@ -56,10 +54,9 @@ const PuzzleGameCore = ({ wordData, onNext }) => {
       console.warn("audioerror:", error);
     }
 
-
     const timer = setTimeout(() => {
       onNext();
-    }, 1000); 
+    }, 1000);
 
     return () => clearTimeout(timer);
   }, [assembledWord, wordData, onNext]);

@@ -34,3 +34,110 @@
   position: relative;
   z-index: 2;
 }
+
+.lesson-card {
+  border-radius: 20px;
+  background-color: #fff0f6; /* light pink */
+  position: relative;
+  overflow: hidden;
+  min-height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+
+.lesson-card:hover {
+  transform: translateY(-4px);
+}
+
+/* progress background fill */
+.lesson-card-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background-color: #ffc2d1; /* soft progress pink */
+  z-index: 1;
+  transition: width 0.5s ease;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+}
+
+/* card content stays above fill */
+.lesson-card-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+}
+
+.lesson-card-content h5 {
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: #772953;
+}
+
+.lesson-card-content .btn {
+  border-radius: 12px;
+  font-weight: 500;
+}
+.lesson-card {
+  position: relative;
+  background-color: #fff0f6; /* soft pink background */
+  border: none;
+  border-radius: 20px;
+  min-height: 160px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.lesson-card:hover {
+  transform: translateY(-4px);
+}
+
+/* Progress fill */
+.lesson-card-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background-color: #ffc2d1; /* pastel progress color */
+  z-index: 1;
+  transition: width 0.4s ease;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+}
+
+/* Content layer */
+.lesson-card-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  text-align: center;
+}
+
+.lesson-card-content h5 {
+  font-weight: 600;
+  font-size: 1.3rem;
+  color: #772953;
+  margin-bottom: 15px;
+}
+
+.lesson-card-content .btn {
+  border-radius: 12px;
+  font-weight: 500;
+  background-color: white;
+  border-color: #772953;
+  color: #772953;
+}
+
+.lesson-card-content .btn:hover {
+  background-color: #fce0ea;
+  border-color: #772953;
+  color: #772953;
+}

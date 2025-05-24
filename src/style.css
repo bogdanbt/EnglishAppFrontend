@@ -1,0 +1,104 @@
+/* Global background and typography */
+body {
+  background-color: #f9dbe8; /* soft pink background */
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Page headings */
+h2 {
+  font-weight: bold;
+  color: #772953;
+}
+
+/* Import button styling */
+.btn-primary {
+  background-color: #f56a9b;
+  border-color: #f56a9b;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.btn-primary:hover {
+  background-color: #e2578a;
+  border-color: #e2578a;
+}
+
+/* Grammar course cards */
+.grammar-card {
+  border-radius: 20px;
+  padding: 20px;
+  color: white;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+  height: 180px;
+  min-width: 240px;
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 600;
+  position: relative;
+  margin: 0 auto;
+}
+
+.grammar-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Pastel background colors for cards */
+.bg-pink {
+  background-color: #f56a9b;
+}
+
+.bg-yellow {
+  background-color: #fdbc4b;
+}
+
+.bg-orange {
+  background-color: #f38e6b;
+}
+
+.bg-purple {
+  background-color: #c59fff;
+}
+
+.bg-light-blue {
+  background-color: #84d3f5;
+}
+
+/* Action button inside cards */
+.grammar-card .btn-light {
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  white-space: nowrap;
+}
+.grammar-card .btn-light:hover {
+  background-color: #f0f0f0;
+}
+.custom-sentence-card {
+  background-color: #ffeef5; /* soft pink card */
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  padding: 15px 20px;
+  margin-bottom: 20px;
+}
+
+.custom-sentence-card strong {
+  color: #772953;
+}
+
+.custom-sentence-card .btn-outline-primary {
+  border-radius: 10px;
+  padding: 4px 12px;
+  font-size: 0.9rem;
+}

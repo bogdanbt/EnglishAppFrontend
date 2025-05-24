@@ -37,14 +37,13 @@ const VocabularyBulkImport = () => {
       }
 
       const obj = {
-        userId: user.id,
-        courseName: course,
-        lessonName: lesson,
-        word,
-        translation,
+        userId: String(user.id),
+        courseName: String(course),
+        lessonName: String(lesson),
+        word: String(word),
+        translation: String(translation),
         repeats: 0,
       };
-
       objects.push(obj);
       previewTable.push({ row, status: "Ready" });
     });

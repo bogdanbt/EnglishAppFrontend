@@ -1,11 +1,12 @@
 import axios from "axios";
+import CONFIG from "../config";
 
 const API = axios.create({
-  baseURL: "https://englishappbackend.onrender.com",
+  baseURL: CONFIG.API_BASE_URL,
   withCredentials: true, // Required for cookies (refreshToken)
 });
 
-// ✅ Add accessToken to every request if available
+// Add accessToken to every request if available
 API.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("accessToken");
@@ -17,7 +18,7 @@ API.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// ✅ Automatically refresh accessToken on 401
+// Automatically refresh accessToken on 401
 API.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -28,7 +29,7 @@ API.interceptors.response.use(
 
       try {
         const { data } = await axios.post(
-          "https://englishappbackend.onrender.com/auth/refresh",
+          `${CONFIG.API_BASE_URL}/auth/refresh`,
           {},
           { withCredentials: true }
         );
