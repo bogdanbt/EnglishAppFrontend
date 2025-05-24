@@ -97,6 +97,33 @@ const Lesson = () => {
             >
               Reset Progress
             </button>
+            <div className="text-center">
+              <button
+                className="btn btn-danger mt-3"
+                onClick={async () => {
+                  if (
+                    window.confirm(
+                      "Are you sure you want to delete this lesson and all its words?"
+                    )
+                  ) {
+                    try {
+                      await API.delete(
+                        `/words/${user.id}/${decodedCourseName}/${decodedLessonName}`
+                      );
+                      alert("Lesson deleted.");
+                      window.location.href = `/course/${encodeURIComponent(
+                        decodedCourseName
+                      )}`;
+                    } catch (err) {
+                      console.error("Error deleting lesson:", err);
+                      alert("Failed to delete lesson.");
+                    }
+                  }
+                }}
+              >
+                Delete Entire Lesson
+              </button>
+            </div>
           </div>
         </>
       ) : (

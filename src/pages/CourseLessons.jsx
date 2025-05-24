@@ -60,14 +60,32 @@ const CourseLessons = () => {
         <div className="row">
           {lessons.map((lesson, index) => (
             <div key={index} className="col-md-4 mb-4">
-              <div className="card p-3 shadow-sm lesson-card">
-                {/* Progress fill background */}
+              <div className="card p-3 shadow-sm lesson-card position-relative">
+                {/* Кнопка удаления в углу */}
+                <button
+                  className="btn btn-sm btn-danger position-absolute top-0 end-0 m-2"
+                  onClick={async () => {
+                    if (window.confirm(`Delete lesson "${lesson}"?`)) {
+                      try {
+                        await API.delete(
+                          `/words/${user.id}/${decodedCourseName}/${lesson}`
+                        );
+                        setLessons(lessons.filter((l) => l !== lesson));
+                      } catch (err) {
+                        console.error("Error deleting lesson:", err);
+                        alert("Failed to delete.");
+                      }
+                    }
+                  }}
+                >
+                  ×
+                </button>
+
+                {/* Прогресс и кнопка перехода */}
                 <div
                   className="lesson-card-fill"
                   style={{ width: `${getRepeatPercentage(lesson)}%` }}
                 ></div>
-
-                {/* Card content */}
                 <div className="lesson-card-content">
                   <h5 className="text-center">{lesson}</h5>
                   <Link
