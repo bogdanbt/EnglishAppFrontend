@@ -43,7 +43,10 @@ const GrammarGame = () => {
     const extra = current.extraWords || [];
 
     const allPieces = shuffleArray(
-      [...base, ...extra].map((word, index) => ({ id: `${index}-${word}`, text: word }))
+      [...base, ...extra].map((word, index) => ({
+        id: `${index}-${word}`,
+        text: word,
+      }))
     );
 
     setPieces(allPieces);
@@ -59,7 +62,8 @@ const GrammarGame = () => {
     const correctWords = sentences[currentIndex].sentenceGrammar.split(" ");
     if (updated.length === correctWords.length) {
       const isCorrect =
-        updated.map((w) => w.text).join(" ") === sentences[currentIndex].sentenceGrammar;
+        updated.map((w) => w.text).join(" ") ===
+        sentences[currentIndex].sentenceGrammar;
       setFeedback(isCorrect ? "✅ Correct!" : "❌ Mistake!");
 
       if (isCorrect) {
@@ -75,7 +79,9 @@ const GrammarGame = () => {
               console.error("Restart error:", err);
             }
 
-            navigate(`/grammar-course/${encodeURIComponent(courseGrammarName)}`);
+            navigate(
+              `/grammar-course/${encodeURIComponent(courseGrammarName)}`
+            );
           } else {
             setCurrentIndex((prev) => prev + 1);
           }
@@ -90,7 +96,10 @@ const GrammarGame = () => {
     const extra = current.extraWords || [];
 
     const allPieces = shuffleArray(
-      [...base, ...extra].map((word, index) => ({ id: `${index}-${word}`, text: word }))
+      [...base, ...extra].map((word, index) => ({
+        id: `${index}-${word}`,
+        text: word,
+      }))
     );
 
     setPieces(allPieces);
@@ -104,6 +113,29 @@ const GrammarGame = () => {
 
   return (
     <div className="container mt-5">
+      <div className="mb-4">
+        <div className="d-flex justify-content-between mb-1">
+          <small>
+            Sentence {currentIndex + 1} of {sentences.length}
+          </small>
+          <small>
+            {Math.round(((currentIndex + 1) / sentences.length) * 100)}%
+          </small>
+        </div>
+        <div className="progress" style={{ height: "8px" }}>
+          <div
+            className="progress-bar bg-info"
+            role="progressbar"
+            style={{
+              width: `${((currentIndex + 1) / sentences.length) * 100}%`,
+            }}
+            aria-valuenow={currentIndex + 1}
+            aria-valuemin="0"
+            aria-valuemax={sentences.length}
+          />
+        </div>
+      </div>
+
       <h4 className="text-center mb-4">Translation: {current.translation}</h4>
 
       <div className="d-flex flex-wrap justify-content-center mb-3">

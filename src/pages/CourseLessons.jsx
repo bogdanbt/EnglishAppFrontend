@@ -11,6 +11,10 @@ const CourseLessons = () => {
 
   const [lessons, setLessons] = useState([]);
   const [progress, setProgress] = useState([]);
+  const extractLessonNumber = (lessonTitle) => {
+    const match = lessonTitle.match(/\d+(\.\d+)?/);
+    return match ? parseFloat(match[0]) : Infinity;
+  };
 
   useEffect(() => {
     if (!user || !user.id) return;
@@ -20,8 +24,11 @@ const CourseLessons = () => {
         const response = await API.get(
           `/lessons/${user.id}/${decodedCourseName}`
         );
-
-        setLessons(response.data.lessons);
+        //sort
+        const sortedLessons = response.data.lessons.sort((a, b) => {
+          return extractLessonNumber(a) - extractLessonNumber(b);
+        });
+        setLessons(sortedLessons);
 
         // 2. Get lesson progress
         const progressRes = await API.get(
@@ -96,6 +103,29 @@ const CourseLessons = () => {
                   >
                     Open Lesson
                   </Link>
+
+                  {/* <button
+                    className="btn btn-sm btn-success mt-2"
+                    onClick={async () => {
+                      try {
+                        await API.patch("/lesson-progress/increment", {
+                          userId: user.id,
+                          courseName: decodedCourseName,
+                          lessonName: lesson,
+                        });
+                        // Обновим локальный прогресс
+                        const progressRes = await API.get(
+                          `/lesson-progress/${user.id}/${decodedCourseName}`
+                        );
+                        setProgress(progressRes.data);
+                      } catch (err) {
+                        console.error("Ошибка при увеличении прогресса:", err);
+                        alert("Не удалось обновить прогресс.");
+                      }
+                    }}
+                  >
+                    +1 к прогрессу
+                  </button> */}
                 </div>
               </div>
             </div>

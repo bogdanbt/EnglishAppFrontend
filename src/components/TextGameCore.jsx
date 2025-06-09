@@ -15,17 +15,16 @@ const TextGameCore = ({ word, onNext }) => {
   const [completed, setCompleted] = useState(false);
   const [renderNumber, setRenderNumber] = useState(1);
 
-
   useEffect(() => {
     if (isCorrect && isCorrect2 && isCorrect3 && renderNumber >= 13) {
       const timer = setTimeout(() => {
         setCompleted(true);
         if (onNext) {
-          onNext(); 
+          onNext();
         }
-      }, 1500); 
+      }, 1500);
 
-      return () => clearTimeout(timer); 
+      return () => clearTimeout(timer);
     }
   }, [isCorrect, isCorrect2, isCorrect3, renderNumber, onNext]);
 
@@ -112,9 +111,7 @@ const TextGameCore = ({ word, onNext }) => {
   if (error) return <div>Error: {error}</div>;
   if (completed) return <div>🎉 Congratulations.</div>;
 
-
-  const debugMode = false; 
-
+  const debugMode = false;
 
   return (
     <>
@@ -160,24 +157,24 @@ const TextGameCore = ({ word, onNext }) => {
                         value.trim().toLowerCase() ===
                         examples[0]?.sourceTerm.toLowerCase()
                       ) {
-                        setIsCorrect(true); 
+                        setIsCorrect(true);
                         setRenderNumber(4);
                       } else {
-                        setIsCorrect(false); 
+                        setIsCorrect(false);
                       }
                     }}
                     autoFocus
                   />
                 ) : (
-                  <b className="text-success">{examples[0]?.sourceTerm}</b>
+                  <h5 className="typing-text text-success">
+                    {examples[0]?.sourceTerm}
+                  </h5>
                 )}
               </form>
               {currentExampleIndex === 0 && !isCorrect && userInput && (
-                <small className="text-danger">
-                  Try again
-                </small>
+                <small className="text-danger">Try again</small>
               )}
-              {isCorrect && <small className="text-success">✅ Correct!</small>}
+              {/* {isCorrect && <small className="text-success">✅ Correct!</small>} */}
             </div>
           )}
 
@@ -192,6 +189,7 @@ const TextGameCore = ({ word, onNext }) => {
       <div>
         {renderNumber >= 5 && (
           <div onAnimationEnd={() => setRenderNumber(6)}>
+            <hr />
             <h5 className="typing-text">
               {examples[1]?.targetPrefix} <b>{examples[1]?.targetTerm}</b>{" "}
               {examples[1]?.targetSuffix}
@@ -223,24 +221,26 @@ const TextGameCore = ({ word, onNext }) => {
                         value.trim().toLowerCase() ===
                         examples[1]?.sourceTerm.toLowerCase()
                       ) {
-                        setIsCorrect2(true); 
+                        setIsCorrect2(true);
                         setRenderNumber(8);
                       } else {
-                        setIsCorrect2(false); 
+                        setIsCorrect2(false);
                       }
                     }}
                     autoFocus
                   />
                 ) : (
-                  <b className="text-success">{examples[1]?.sourceTerm}</b>
+                  <h5 className="typing-text text-success">
+                    {examples[0]?.sourceTerm}
+                  </h5>
                 )}
               </form>
               {currentExampleIndex === 0 && !isCorrect2 && userInput2 && (
-                <small className="text-danger">
-                  Try again
-                </small>
+                <small className="text-danger">Try again</small>
               )}
-              {isCorrect2 && <small className="text-success">✅ Correct!</small>}
+              {/* {isCorrect2 && (
+                <small className="text-success">✅ Correct!</small>
+              )} */}
             </div>
           )}
 
@@ -255,6 +255,7 @@ const TextGameCore = ({ word, onNext }) => {
       <div>
         {renderNumber >= 9 && (
           <div onAnimationEnd={() => setRenderNumber(10)}>
+            <hr />
             <h5 className="typing-text">
               {examples[2]?.targetPrefix} <b>{examples[2]?.targetTerm}</b>{" "}
               {examples[2]?.targetSuffix}
@@ -286,24 +287,26 @@ const TextGameCore = ({ word, onNext }) => {
                         value.trim().toLowerCase() ===
                         examples[2]?.sourceTerm.toLowerCase()
                       ) {
-                        setIsCorrect3(true); 
-                        setRenderNumber(12); 
+                        setIsCorrect3(true);
+                        setRenderNumber(12);
                       } else {
-                        setIsCorrect3(false); 
+                        setIsCorrect3(false);
                       }
                     }}
                     autoFocus
                   />
                 ) : (
-                  <b className="text-success">{examples[2]?.sourceTerm}</b>
+                  <h5 className="typing-text text-success">
+                    {examples[0]?.sourceTerm}
+                  </h5>
                 )}
               </form>
               {currentExampleIndex === 0 && !isCorrect3 && userInput3 && (
-                <small className="text-danger">
-Try again
-                </small>
+                <small className="text-danger">Try again</small>
               )}
-              {isCorrect3 && <small className="text-success">✅ Correct!</small>}
+              {/* {isCorrect3 && (
+                <small className="text-success">✅ Correct!</small>
+              )} */}
             </div>
           )}
 
@@ -316,10 +319,7 @@ Try again
       </div>
 
       {renderNumber >= 13 && isCorrect && isCorrect2 && isCorrect3 && (
-        <div className="mt-3 alert alert-success">
-          
-Next Word
-        </div>
+        <div className="mt-3 alert alert-success">Next Word</div>
       )}
     </>
   );

@@ -1,9 +1,14 @@
-
 .typing-text {
-  overflow: hidden;
-  border-right: 0.15em solid rgba(255, 255, 255, 0);
-  white-space: nowrap;
-  animation: typing 2s steps(40, end), blink-caret 0.75s step-end infinite;
+  opacity: 0;
+  animation: fadeIn 0.5s ease-in forwards;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes typing {
@@ -24,7 +29,6 @@
     border-color: rgb(255, 255, 255);
   }
 }
-
 
 .usage-examples {
   font-size: 1.2rem;
