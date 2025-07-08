@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
-import API from "../utils/api";
-import "../styles/Courses.css"; // Add this line
+import { AuthContext } from "../../context/AuthContext";
+import API from "../../utils/api";
+import "../../styles/Courses.css"; // Add this line
 
 const colorClasses = [
   "bg-pink",

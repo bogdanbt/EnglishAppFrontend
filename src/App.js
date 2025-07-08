@@ -3,24 +3,28 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { AuthProvider } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-
-import Courses from "./pages/Courses";
-import CourseLessons from "./pages/CourseLessons";
-import Lesson from "./pages/Lesson";
-import GamePuzzle from "./pages/GamePuzzle";
-
 import DailyGames from "./components/DailyGames";
-import GrammarCourses from "./pages/GrammarCourses";
-import GrammarCourseLessons from "./pages/GrammarCourseLessons";
-import GrammarLesson from "./pages/GrammarLesson";
+import LessonRevision from "./components/LessonRevision";
+import Home from "./pages/home/Home";
+import Login from "./pages/auth/Login";
+import Register from "./pages/auth/Register";
+
+// Vocabulary section
+import Courses from "./pages/vocabulary/Courses";
+import CourseLessons from "./pages/vocabulary/CourseLessons";
+import VocabularyLesson from "./pages/vocabulary/VocabularyLesson";
+import VocabularyGamePuzzle from "./pages/vocabulary/VocabularyGamePuzzle";
+import VocabularyBulkImport from "./pages/vocabulary/VocabularyBulkImport";
+import VocabularyManualImport from "./pages/vocabulary/VocabularyManualImport";
+
+// Grammar section
+import GrammarCourses from "./pages/grammar/GrammarCourses";
+import GrammarCourseLessons from "./pages/grammar/GrammarCourseLessons";
+import GrammarLesson from "./pages/grammar/GrammarLesson";
 import GrammarGame from "./components/GrammarGame";
-import GrammarManualImport from "./pages/GrammarManualImport";
-import GrammarBulkImport from "./pages/GrammarBulkImport";
-import VocabularyBulkImport from "./pages/VocabularyBulkImport.jsx";
-import VocabularyManualImport from "./pages/VocabularyManualImport.jsx";
+import GrammarBulkImport from "./pages/grammar/GrammarBulkImport";
+import GrammarManualImport from "./pages/grammar/GrammarManualImport";
+
 import "./index.css";
 import "./style.css";
 
@@ -60,6 +64,10 @@ const App = () => {
               }
             />
             <Route
+              path="/revision/course/:courseName/lesson/:lessonName"
+              element={<LessonRevision />}
+            />
+            <Route
               path="/grammar-course/:courseGrammarName/lesson/:lessonGrammarName/game"
               element={
                 <ProtectedRoute>
@@ -89,7 +97,7 @@ const App = () => {
               path="/game-puzzle/course/:courseName/lesson/:lessonName"
               element={
                 <ProtectedRoute>
-                  <GamePuzzle />
+                  <VocabularyGamePuzzle />
                 </ProtectedRoute>
               }
             />
@@ -97,7 +105,7 @@ const App = () => {
               path="/course/:courseName/lesson/:lessonName"
               element={
                 <ProtectedRoute>
-                  <Lesson />
+                  <VocabularyLesson />
                 </ProtectedRoute>
               }
             />

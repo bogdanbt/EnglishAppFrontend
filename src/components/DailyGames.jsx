@@ -3,6 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import API from "../utils/api";
 import TextGameCore from "./TextGameCore";
+import Speak from "../components/Speak";
+import MatchExamplePairsGame from "./MatchExamplePairsGame";
 
 const DailyGames = () => {
   const { user } = useContext(AuthContext);
@@ -82,12 +84,18 @@ const DailyGames = () => {
           />
         </div>
       </div>
+      <Speak word={wordList[currentIndex]?.word} showButton delay={100} />
+      <MatchExamplePairsGame
+        key={wordList[currentIndex]?.word}
+        word={wordList[currentIndex]?.word}
+        onComplete={handleNextWord}
+      />
 
-      <TextGameCore
+      {/* <TextGameCore
         key={wordList[currentIndex]?.word}
         word={wordList[currentIndex]?.word}
         onNext={handleNextWord}
-      />
+      /> */}
     </>
   );
 };

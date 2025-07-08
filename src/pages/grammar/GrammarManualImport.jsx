@@ -1,9 +1,9 @@
-import React, { useContext, useEffect, useState } from "react";
-import API from "../utils/api";
-import { AuthContext } from "../context/AuthContext";
+import React, { useState, useEffect, useContext } from "react";
+import API from "../../utils/api";
+import { AuthContext } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-const VocabularyManualImport = () => {
+const GrammarManualImport = () => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const [courses, setCourses] = useState([]);
@@ -14,30 +14,34 @@ const VocabularyManualImport = () => {
   const [customCourse, setCustomCourse] = useState("");
   const [customLesson, setCustomLesson] = useState("");
 
-  const [entries, setEntries] = useState([{ word: "", translation: "" }]);
+  const [entries, setEntries] = useState([
+    { sentence: "", translation: "", extra: "" },
+  ]);
 
   const fetchCourses = async () => {
     try {
-      const res = await API.get(`/courses/${user.id}`);
+      const res = await API.get(`/grammar-courses/${user.id}`);
       setCourses(res.data.courses);
     } catch (err) {
-      console.error("Error loading courses:", err);
+      console.error("Failed to load courses:", err);
     }
   };
 
   const fetchLessons = async (courseName) => {
     try {
       const res = await API.get(
-        `/lessons/${user.id}/${encodeURIComponent(courseName)}`
+        `/grammar-lessons/${user.id}/${encodeURIComponent(courseName)}`
       );
       setLessons(res.data.lessons);
     } catch (err) {
-      console.error("Error loading lessons:", err);
+      console.error("Failed to load lessons:", err);
     }
   };
 
   useEffect(() => {
-    if (user?.id) fetchCourses();
+    if (user?.id) {
+      fetchCourses();
+    }
   }, [user]);
 
   useEffect(() => {
@@ -49,13 +53,13 @@ const VocabularyManualImport = () => {
   }, [selectedCourse, customCourse]);
 
   const handleEntryChange = (index, field, value) => {
-    const updated = [...entries];
-    updated[index][field] = value;
-    setEntries(updated);
+    const newEntries = [...entries];
+    newEntries[index][field] = value;
+    setEntries(newEntries);
   };
 
   const addRow = () => {
-    setEntries([...entries, { word: "", translation: "" }]);
+    setEntries([...entries, { sentence: "", translation: "", extra: "" }]);
   };
 
   const removeRow = (index) => {
@@ -67,30 +71,35 @@ const VocabularyManualImport = () => {
     const finalLesson = customLesson.trim() || selectedLesson;
 
     if (!finalCourse || !finalLesson) {
-      alert("Please specify a course and a lesson.");
+      alert("Please specify both course and lesson.");
       return;
     }
 
     const prepared = entries
-      .filter((e) => e.word.trim() && e.translation.trim())
+      .filter((entry) => entry.sentence.trim())
       .map((entry) => ({
         userId: user.id,
-        courseName: finalCourse,
-        lessonName: finalLesson,
-        word: entry.word,
+        courseGrammarName: finalCourse,
+        lessonGrammarName: finalLesson,
+        sentenceGrammar: entry.sentence,
         translation: entry.translation,
-        repeats: 0,
+        extraWords: entry.extra
+          .split(/[,\s]+/)
+          .filter(Boolean)
+          .map((w) => w.trim()),
       }));
 
     if (prepared.length === 0) {
-      alert("No words to import.");
+      alert("Please add at least one sentence.");
       return;
     }
 
     try {
-      const res = await API.post("/words", prepared);
-      alert(`Successfully imported ${res.data.inserted.length} words.`);
-      setEntries([{ word: "", translation: "" }]);
+      const res = await API.post("/grammar", prepared);
+      alert(
+        "Successfully imported: " + res.data.inserted.length + " sentences"
+      );
+      setEntries([{ sentence: "", translation: "", extra: "" }]);
     } catch (err) {
       console.error("Import error:", err);
       alert("Error during import.");
@@ -99,18 +108,18 @@ const VocabularyManualImport = () => {
 
   return (
     <div className="container mt-5">
-      <h2>Manual Vocabulary Import</h2>
+      <h2 className="mb-4">Manual Grammar Sentence Import</h2>
 
       <div className="text-center my-4">
         <button
           className="btn btn-primary btn-lg"
-          onClick={() => navigate("/import-vocabulary-extended")}
+          onClick={() => navigate("/import-grammar-extended")}
         >
-          Open Extended Import
+          Import (Extended)
         </button>
       </div>
 
-      <div className="row mb-4">
+      <div className="mb-3 row">
         <div className="col-md-6">
           <label>Select a course:</label>
           <select
@@ -123,13 +132,14 @@ const VocabularyManualImport = () => {
             }}
             disabled={customCourse.trim() !== ""}
           >
-            <option value="">— select a course —</option>
+            <option value="">— select course —</option>
             {courses.map((course, i) => (
               <option key={i} value={course}>
                 {course}
               </option>
             ))}
           </select>
+
           <input
             className="form-control mt-2"
             placeholder="or enter a new course"
@@ -152,13 +162,14 @@ const VocabularyManualImport = () => {
               (!selectedCourse && !customCourse.trim())
             }
           >
-            <option value="">— select a lesson —</option>
+            <option value="">— select lesson —</option>
             {lessons.map((lesson, i) => (
               <option key={i} value={lesson}>
                 {lesson}
               </option>
             ))}
           </select>
+
           <input
             className="form-control mt-2"
             placeholder="or enter a new lesson"
@@ -168,11 +179,14 @@ const VocabularyManualImport = () => {
         </div>
       </div>
 
+      <hr />
+
       <table className="table">
         <thead>
           <tr>
-            <th>Word (EN)</th>
-            <th>Translation (RU)</th>
+            <th>Sentence (EN)</th>
+            <th>Translation</th>
+            <th>Extra Words</th>
             <th></th>
           </tr>
         </thead>
@@ -182,9 +196,9 @@ const VocabularyManualImport = () => {
               <td>
                 <input
                   className="form-control"
-                  value={entry.word}
+                  value={entry.sentence}
                   onChange={(e) =>
-                    handleEntryChange(index, "word", e.target.value)
+                    handleEntryChange(index, "sentence", e.target.value)
                   }
                 />
               </td>
@@ -194,6 +208,16 @@ const VocabularyManualImport = () => {
                   value={entry.translation}
                   onChange={(e) =>
                     handleEntryChange(index, "translation", e.target.value)
+                  }
+                />
+              </td>
+              <td>
+                <input
+                  className="form-control"
+                  placeholder="space or comma separated"
+                  value={entry.extra}
+                  onChange={(e) =>
+                    handleEntryChange(index, "extra", e.target.value)
                   }
                 />
               </td>
@@ -213,16 +237,16 @@ const VocabularyManualImport = () => {
       </table>
 
       <button className="btn btn-outline-secondary mb-3" onClick={addRow}>
-        Add Word
+        Add Row
       </button>
 
       <br />
 
       <button className="btn btn-success" onClick={handleSubmit}>
-        Import Words
+        Import
       </button>
     </div>
   );
 };
 
-export default VocabularyManualImport;
+export default GrammarManualImport;

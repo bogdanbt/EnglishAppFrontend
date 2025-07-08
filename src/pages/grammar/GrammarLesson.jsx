@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
-import API from "../utils/api";
+import { AuthContext } from "../../context/AuthContext";
+import API from "../../utils/api";
 
 const GrammarLesson = () => {
   const { user } = useContext(AuthContext);

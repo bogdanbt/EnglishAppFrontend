@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
-import API from "../utils/api";
+import { AuthContext } from "../../context/AuthContext";
+import API from "../../utils/api";
+import Speak from "../../components/Speak";
 
 const Lesson = () => {
   const { user } = useContext(AuthContext);
@@ -41,6 +42,7 @@ const Lesson = () => {
               <div key={index} className="col-md-4 mb-4">
                 <div className="card p-3 shadow-sm">
                   <h5 className="text-center">{wordObj.word}</h5>
+                  <Speak word={wordObj.word} showButton />
                   <p className="text-center text-muted">
                     {wordObj.translation}
                   </p>
@@ -75,6 +77,14 @@ const Lesson = () => {
               className="btn btn-outline-success mt-3"
             >
               Start Daily Games
+            </Link>
+            <Link
+              to={`/revision/course/${encodeURIComponent(
+                courseName
+              )}/lesson/${encodeURIComponent(lessonName)}`}
+              className="btn btn-outline-warning mt-3"
+            >
+              Repeat Words from This Lesson
             </Link>
           </div>
 

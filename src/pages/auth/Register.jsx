@@ -1,24 +1,24 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
-import API from "../utils/api";
-
-const Login = () => {
+// import axios from "axios";
+// import CONFIG from "../../config";
+import API from "../../utils/api";
+const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await API.post("/auth/login", { email, password });
-      login(res.data.accessToken);
-      navigate("/");
+      await API.post("/auth/register", { email, password });
+      alert("Registration successful! You can now log in.");
+      navigate("/login");
     } catch (error) {
-      alert("Invalid credentials. Please try again.");
+      alert("Error registering. Please try again.");
+      console.error("Registration error:", error);
     } finally {
       setLoading(false);
     }
@@ -31,7 +31,7 @@ const Login = () => {
         style={{ height: "100vh", backgroundColor: "#FFE4EC" }}
       >
         <div
-          className="spinner-border text-primary"
+          className="spinner-border text-success"
           role="status"
           style={{ width: "3rem", height: "3rem" }}
         >
@@ -63,15 +63,12 @@ const Login = () => {
         }}
       >
         <h2 className="mb-4 text-center" style={{ color: "#FF6D7A" }}>
-          Login to Vocally
+          Register at Vocally
         </h2>
-        <form onSubmit={handleLogin}>
+        <form onSubmit={handleRegister}>
           <div className="mb-3">
-            <label htmlFor="email" className="form-label">
-              Email address
-            </label>
+            <label>Email</label>
             <input
-              id="email"
               type="email"
               className="form-control"
               value={email}
@@ -82,11 +79,8 @@ const Login = () => {
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="password" className="form-label">
-              Password
-            </label>
+            <label>Password</label>
             <input
-              id="password"
               type="password"
               className="form-control"
               value={password}
@@ -95,8 +89,8 @@ const Login = () => {
               required
             />
           </div>
-          <button type="submit" className="btn btn-primary w-100">
-            Sign In
+          <button type="submit" className="btn btn-success w-100">
+            Create Account
           </button>
         </form>
       </div>
@@ -104,4 +98,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;

@@ -1,20 +1,20 @@
 import React, { useState, useContext } from "react";
-import API from "../utils/api";
-import { AuthContext } from "../context/AuthContext";
+import API from "../../utils/api";
+import { AuthContext } from "../../context/AuthContext";
 
-const VocabularyBulkImport = () => {
+const GrammarBulkImport = () => {
   const { user } = useContext(AuthContext);
   const [rawData, setRawData] = useState("");
   const [colDelimiter, setColDelimiter] = useState("/");
   const [rowDelimiter, setRowDelimiter] = useState("\n");
   const [preview, setPreview] = useState([]);
-  const [parsedWords, setParsedWords] = useState([]);
+  const [parsedObjects, setParsedObjects] = useState([]);
 
   const parseData = () => {
-    const actualRowDelimiter = rowDelimiter === "\\n" ? "\n" : rowDelimiter;
+    const realRowDelimiter = rowDelimiter === "\\n" ? "\n" : rowDelimiter;
     const rows = rawData
-      .split(actualRowDelimiter)
-      .map((r) => r.trim())
+      .split(realRowDelimiter)
+      .map((row) => row.trim())
       .filter((r) => r.length > 0);
 
     const objects = [];
@@ -25,68 +25,76 @@ const VocabularyBulkImport = () => {
 
       const course = cols[0] || "";
       const lesson = cols[1] || "";
-      const word = cols[2] || "";
+      const sentence = cols[2] || "";
       const translation = cols[3] || "";
+      const extra = cols[4] || "";
 
-      if (!course || !lesson || !word || !translation) {
+      if (!course || !lesson || !sentence) {
         previewTable.push({
           row,
-          status: "Skipped (missing fields)",
+          status: "Skipped (missing course/lesson/sentence)",
         });
         return;
       }
 
       const obj = {
-        userId: String(user.id),
-        courseName: String(course),
-        lessonName: String(lesson),
-        word: String(word),
-        translation: String(translation),
-        repeats: 0,
+        userId: user.id,
+        courseGrammarName: course,
+        lessonGrammarName: lesson,
+        sentenceGrammar: sentence,
+        translation,
+        extraWords: extra
+          .split(/[,\s]+/)
+          .filter(Boolean)
+          .map((e) => e.trim()),
       };
+
       objects.push(obj);
       previewTable.push({ row, status: "Ready" });
     });
 
-    setParsedWords(objects);
+    setParsedObjects(objects);
     setPreview(previewTable);
   };
 
   const handleImport = async () => {
-    if (parsedWords.length === 0 && rawData.trim()) {
-      alert("Click 'Preview' first to prepare the data.");
+    if (parsedObjects.length === 0 && rawData.trim()) {
+      alert("Please click 'Preview' first to prepare the data.");
       return;
     }
 
-    if (parsedWords.length === 0) {
+    if (parsedObjects.length === 0) {
       alert("No data to import.");
       return;
     }
 
     try {
-      const res = await API.post("/words", parsedWords);
-      alert(`Imported ${res.data.inserted.length} words successfully.`);
+      const res = await API.post("/grammar", parsedObjects);
+      alert(`Successfully imported ${res.data.inserted.length} sentences.`);
       setRawData("");
-      setParsedWords([]);
+      setParsedObjects([]);
       setPreview([]);
     } catch (err) {
       console.error("Import error:", err);
-      alert("Error during import.");
+      alert("An error occurred during import.");
     }
   };
 
   return (
     <div className="container mt-5">
-      <h2>Vocabulary Import (Advanced Mode)</h2>
+      <h2>Bulk Import from Table</h2>
 
       <p className="alert alert-light">
         <strong>Expected format:</strong>
         <br />
-        <code>Course / Lesson / Word / Translation</code>
+        <code>Course / Lesson / Sentence / Translation / Extra Words</code>
         <br />
         <em>Example:</em>
         <br />
-        <code>A2 / School / apple / яблоко</code>
+        <code>
+          A2 / Past Simple / I went to school / Я пошёл в школу / never quickly
+          always
+        </code>
       </p>
 
       <div className="row my-3">
@@ -94,27 +102,27 @@ const VocabularyBulkImport = () => {
           <label>Column delimiter:</label>
           <input
             className="form-control"
+            placeholder="e.g. / or ,"
             value={colDelimiter}
             onChange={(e) => setColDelimiter(e.target.value)}
-            placeholder="e.g., / or ,"
           />
         </div>
         <div className="col-md-6">
           <label>Row delimiter:</label>
           <input
             className="form-control"
+            placeholder="usually: \n or ;"
             value={rowDelimiter}
             onChange={(e) => setRowDelimiter(e.target.value)}
-            placeholder="e.g., \\n or ;"
           />
         </div>
       </div>
 
-      <label>Paste your data:</label>
+      <label className="mt-3">Paste your data:</label>
       <textarea
         className="form-control"
         rows={10}
-        placeholder="Paste lines in format: course / lesson / word / translation"
+        placeholder="Paste rows from a spreadsheet in the format above"
         value={rawData}
         onChange={(e) => setRawData(e.target.value)}
       />
@@ -130,14 +138,14 @@ const VocabularyBulkImport = () => {
 
       {preview.length > 0 && (
         <div className="mt-4">
-          <h5>Parsing Result:</h5>
+          <h5>Parse result:</h5>
           <ul>
             {preview.map((item, i) => (
               <li key={i}>
                 <code>{item.row}</code> —{" "}
                 <strong
                   style={{
-                    color: item.status.toLowerCase().includes("skipped")
+                    color: item.status.includes("Skipped")
                       ? "crimson"
                       : "green",
                   }}
@@ -153,4 +161,4 @@ const VocabularyBulkImport = () => {
   );
 };
 
-export default VocabularyBulkImport;
+export default GrammarBulkImport;
