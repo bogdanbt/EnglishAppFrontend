@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { FaVolumeUp } from "react-icons/fa";
-
+import CONFIG from "../config";
 const Speak = ({
   word,
   lang = "en-us",
@@ -12,7 +12,7 @@ const Speak = ({
 }) => {
   const speak = () => {
     if (!word) return;
-    const url = `http://localhost:5000/speak/${encodeURIComponent(
+    const url = `${CONFIG.API_BASE_URL}/speak/${encodeURIComponent(
       word
     )}?lang=${lang}`;
     const audio = new Audio(url);
