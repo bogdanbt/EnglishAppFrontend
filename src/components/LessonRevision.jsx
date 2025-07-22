@@ -1,64 +1,61 @@
-// LessonRevision.jsx
-import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+
+
+import React, { useEffect, useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import API from "../utils/api";
 import KnowledgeTypingGame from "./KnowledgeTypingGame";
+
+const GAME_WORDS_KEY = "gameWordList";
 
 const LessonRevision = () => {
   const { user } = useContext(AuthContext);
-  const { courseName, lessonName } = useParams();
-  const decodedCourseName = decodeURIComponent(courseName);
-  const decodedLessonName = decodeURIComponent(lessonName);
-
-  const [words, setWords] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [completed, setCompleted] = useState(false);
+  const navigate = useNavigate();
+  const [wordList, setWordList] = useState([]);
 
   useEffect(() => {
-    if (!user || !user.id) return;
-
-    const fetchWords = async () => {
+    const stored = localStorage.getItem(GAME_WORDS_KEY);
+    if (stored) {
       try {
-        const response = await API.get(
-          `/words/${user.id}/${decodedCourseName}/${decodedLessonName}`
-        );
-        setWords(response.data);
-      } catch (error) {
-        console.error("Error loading words:", error);
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          setWordList(parsed);
+        } else {
+          navigate("/courses");
+        }
+      } catch {
+        navigate("/courses");
       }
-    };
-
-    fetchWords();
-  }, [user, decodedCourseName, decodedLessonName]);
-
-  const handleGameComplete = () => {
-    if (currentIndex + 1 < words.length) {
-      setCurrentIndex(currentIndex + 1);
     } else {
-      setCompleted(true);
+      navigate("/courses");
+    }
+  }, [navigate]);
+
+  const handleComplete = (updatedList) => {
+    if (updatedList.length === 0) {
+      localStorage.removeItem(GAME_WORDS_KEY);
+      navigate("/courses");
+    } else {
+      localStorage.setItem(GAME_WORDS_KEY, JSON.stringify(updatedList));
+      setWordList(updatedList);
     }
   };
 
-  if (completed) {
-    return <div className="text-center mt-5">All words revised!</div>;
-  }
-
-  if (words.length === 0) {
-    return <div className="text-center mt-5">Loading words...</div>;
-  }
+  const current = wordList[0];
 
   return (
     <div className="container mt-5">
-      <h3 className="text-center mb-4">
-        Revision: {decodedLessonName} ({currentIndex + 1}/{words.length})
-      </h3>
-      <KnowledgeTypingGame
-        word={words[currentIndex].word}
-        courseName={decodedCourseName}
-        userId={user.id}
-        onComplete={handleGameComplete}
-      />
+      {current ? (
+        <KnowledgeTypingGame
+          word={current.word}
+          translation={current.translation}
+          example={current.example}
+          userId={user.id}
+          courseName={current.courseName}
+          onComplete={() => handleComplete(wordList.slice(1))}
+        />
+      ) : (
+        <p className="text-center">Загрузка...</p>
+      )}
     </div>
   );
 };

@@ -1,102 +1,76 @@
+
+
 import React, { useEffect, useState, useContext } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import API from "../utils/api";
-import TextGameCore from "./TextGameCore";
-import Speak from "../components/Speak";
 import MatchExamplePairsGame from "./MatchExamplePairsGame";
+import API from "../utils/api";
+
+const GAME_WORDS_KEY = "gameWordList";
 
 const DailyGames = () => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
-  const { courseName, lessonName } = useParams();
-
   const [wordList, setWordList] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!user || !user.id) return;
-
-    const fetchWords = async () => {
+    const stored = localStorage.getItem(GAME_WORDS_KEY);
+    if (stored) {
       try {
-        const response = await API.get(
-          `/words/${user.id}/${decodeURIComponent(
-            courseName
-          )}/${decodeURIComponent(lessonName)}`
-        );
-        setWordList(response.data);
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          // очистим на всякий случай перед началом
+          localStorage.removeItem(GAME_WORDS_KEY);
+          localStorage.setItem(GAME_WORDS_KEY, JSON.stringify(parsed));
+          setWordList(parsed);
+        }
       } catch (err) {
-        setError("Не удалось загрузить слова.");
-        console.error(err);
-      } finally {
-        setLoading(false);
+        console.error("Ошибка при чтении gameWordList:", err);
       }
-    };
+    }
+  }, []);
 
-    fetchWords();
-  }, [user, courseName, lessonName]);
+  const handleWordComplete = async () => {
+    const current = wordList[0];
+    const remaining = wordList.slice(1);
 
-  const handleNextWord = async () => {
-    if (currentIndex + 1 >= wordList.length) {
-      try {
-        await API.patch("/lesson-progress/increment", {
-          userId: user.id,
-          courseName: decodeURIComponent(courseName),
-          lessonName: decodeURIComponent(lessonName),
-        });
-      } catch (err) {
-        console.error("Ошибка сохранения прогресса:", err);
-      }
+    try {
+      await API.post("/append-history", {
+        userId: user.id,
+        word: current.word,
+        courseName: current.courseName,
+        date: new Date().toISOString(),
+        status: "intro",
+      });
+    } catch (error) {
+      console.error("Ошибка при отправке истории:", error);
+    }
 
-      navigate(`/course/${courseName}`);
+    if (remaining.length === 0) {
+      localStorage.removeItem(GAME_WORDS_KEY);
+      navigate("/courses");
     } else {
-      setCurrentIndex((prev) => prev + 1);
+      localStorage.setItem(GAME_WORDS_KEY, JSON.stringify(remaining));
+      setWordList(remaining);
     }
   };
 
-  if (loading) return <p>Загрузка...</p>;
-  if (error) return <p className="alert alert-danger">{error}</p>;
-  if (wordList.length === 0) return <p>Нет слов для игры.</p>;
-
   return (
-    <>
-      <div className="mb-3">
-        <div className="d-flex justify-content-between mb-1">
-          <small>
-            Word {currentIndex + 1} of {wordList.length}
-          </small>
-          <small>
-            {Math.round(((currentIndex + 1) / wordList.length) * 100)}%
-          </small>
-        </div>
-        <div className="progress">
-          <div
-            className="progress-bar bg-success"
-            role="progressbar"
-            style={{
-              width: `${((currentIndex + 1) / wordList.length) * 100}%`,
-            }}
-            aria-valuenow={currentIndex + 1}
-            aria-valuemin="0"
-            aria-valuemax={wordList.length}
+    <div className="container mt-5 text-center">
+      {wordList.length > 0 ? (
+        <>
+          <p className="text-muted mb-3">
+            Осталось слов: {wordList.length}
+          </p>
+          <MatchExamplePairsGame
+            word={wordList[0].word}
+            onComplete={handleWordComplete}
           />
-        </div>
-      </div>
-      <Speak word={wordList[currentIndex]?.word} showButton delay={100} />
-      <MatchExamplePairsGame
-        key={wordList[currentIndex]?.word}
-        word={wordList[currentIndex]?.word}
-        onComplete={handleNextWord}
-      />
-
-      {/* <TextGameCore
-        key={wordList[currentIndex]?.word}
-        word={wordList[currentIndex]?.word}
-        onNext={handleNextWord}
-      /> */}
-    </>
+        </>
+      ) : (
+        <p>Загрузка слов...</p>
+      )}
+    </div>
   );
 };
 

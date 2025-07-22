@@ -1,11 +1,8 @@
 // MatchExamplePairsGame.jsx
 import React, { useEffect, useState } from "react";
 import api from "../utils/api";
-import axios from "axios";
+// import axios from "axios";
 
-const subscriptionKey =
-  "2sOjnCvNsCBpsib20ymPiEGySXXpwJCDOimvRFrFnzr94mSEQT4QJQQJ99BBAC5RqLJXJ3w3AAAbACOGL0Pl";
-const region = "westeurope";
 
 const MatchExamplePairsGame = ({ word, onComplete }) => {
   const [cards, setCards] = useState([]);
@@ -18,24 +15,12 @@ const MatchExamplePairsGame = ({ word, onComplete }) => {
         const res = await api.get(`/examples/${encodeURIComponent(word)}`);
         const examples = res.data.examples || [];
 
-        const translations = await Promise.all(
-          examples.map(async (text) => {
-            const response = await axios.post(
-              "https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to=ru",
-              [{ Text: text }],
-              {
-                headers: {
-                  "Ocp-Apim-Subscription-Key": subscriptionKey,
-                  "Ocp-Apim-Subscription-Region": region,
-                  "Content-Type": "application/json",
-                },
-              }
-            );
-            return response.data[0].translations[0].text;
-          })
-        );
-
-        const paired = examples.map((e, i) => ({ en: e, ru: translations[i] }));
+const response = await api.post("/translate", {
+  texts: examples,
+});
+const translations = response.data.translations || [];
+     
+const paired = examples.map((e, i) => ({ en: e, ru: translations[i] }));
 
         const shuffled = shuffle(
           paired.flatMap((p) => [

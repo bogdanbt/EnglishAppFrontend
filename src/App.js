@@ -68,6 +68,10 @@ const App = () => {
               element={<LessonRevision />}
             />
             <Route
+              path="/revision/"
+              element={<LessonRevision />}
+            />
+            <Route
               path="/grammar-course/:courseGrammarName/lesson/:lessonGrammarName/game"
               element={
                 <ProtectedRoute>
@@ -87,6 +91,14 @@ const App = () => {
 
             <Route
               path="/daily-games/course/:courseName/lesson/:lessonName"
+              element={
+                <ProtectedRoute>
+                  <DailyGames />
+                </ProtectedRoute>
+              }
+            />
+             <Route
+              path="/daily-games/"
               element={
                 <ProtectedRoute>
                   <DailyGames />

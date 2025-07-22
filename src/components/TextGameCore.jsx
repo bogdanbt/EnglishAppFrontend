@@ -28,77 +28,113 @@ const TextGameCore = ({ word, onNext }) => {
     }
   }, [isCorrect, isCorrect2, isCorrect3, renderNumber, onNext]);
 
+  // useEffect(() => {
+  //   if (!word) return;
+
+  //   const fetchUsageExamples = async () => {
+  //     setLoading(true);
+  //     setError(null);
+  //     try {
+  //       const translationResponse = await fetch(
+  //         "https://api.cognitive.microsofttranslator.com/dictionary/lookup?api-version=3.0&from=en&to=ru",
+  //         {
+  //           method: "POST",
+  //           headers: {
+  //             "Ocp-Apim-Subscription-Key":
+  //               "---",
+  //             "Ocp-Apim-Subscription-Region": "westeurope",
+  //             "Content-Type": "application/json",
+  //           },
+  //           body: JSON.stringify([{ Text: word }]),
+  //         }
+  //       );
+
+  //       if (!translationResponse.ok)
+  //         throw new Error(`Error translate: ${translationResponse.status}`);
+
+  //       const translationData = await translationResponse.json();
+  //       const topTranslations = (translationData[0]?.translations || [])
+  //         .sort((a, b) => b.confidence - a.confidence)
+  //         .slice(0, 4)
+  //         .map((t) => t.normalizedTarget);
+
+  //       if (topTranslations.length === 0) {
+  //         setError("Translates not found.");
+  //         setLoading(false);
+  //         return;
+  //       }
+
+  //       const examplesResponse = await fetch(
+  //         "https://api.cognitive.microsofttranslator.com/dictionary/examples?api-version=3.0&from=en&to=ru",
+  //         {
+  //           method: "POST",
+  //           headers: {
+  //             "Ocp-Apim-Subscription-Key":
+  //               "---",
+  //             "Ocp-Apim-Subscription-Region": "westeurope",
+  //             "Content-Type": "application/json",
+  //           },
+  //           body: JSON.stringify(
+  //             topTranslations.map((translation) => ({
+  //               Text: word,
+  //               Translation: translation,
+  //             }))
+  //           ),
+  //         }
+  //       );
+
+  //       if (!examplesResponse.ok)
+  //         throw new Error(`Ошибка примеров: ${examplesResponse.status}`);
+
+  //       const examplesData = await examplesResponse.json();
+  //       const allExamples = examplesData
+  //         .flatMap((item) => item.examples || [])
+  //         .slice(0, 3);
+
+  //       if (allExamples.length === 0) {
+  //         setError("sentence  not found");
+  //       } else {
+  //         setExamples(allExamples);
+  //       }
+  //     } catch (err) {
+  //       console.error("sentence not loading", err);
+  //       setError("sentence not loading.");
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchUsageExamples();
+  // }, [word]);
+
+
   useEffect(() => {
     if (!word) return;
 
     const fetchUsageExamples = async () => {
       setLoading(true);
       setError(null);
+
       try {
-        const translationResponse = await fetch(
-          "https://api.cognitive.microsofttranslator.com/dictionary/lookup?api-version=3.0&from=en&to=ru",
-          {
-            method: "POST",
-            headers: {
-              "Ocp-Apim-Subscription-Key":
-                "2sOjnCvNsCBpsib20ymPiEGySXXpwJCDOimvRFrFnzr94mSEQT4QJQQJ99BBAC5RqLJXJ3w3AAAbACOGL0Pl",
-              "Ocp-Apim-Subscription-Region": "westeurope",
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify([{ Text: word }]),
-          }
-        );
+        const res = await fetch("/api/word-examples", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ word }),
+        });
 
-        if (!translationResponse.ok)
-          throw new Error(`Error translate: ${translationResponse.status}`);
+        if (!res.ok) throw new Error("Failed to fetch word examples");
 
-        const translationData = await translationResponse.json();
-        const topTranslations = (translationData[0]?.translations || [])
-          .sort((a, b) => b.confidence - a.confidence)
-          .slice(0, 4)
-          .map((t) => t.normalizedTarget);
-
-        if (topTranslations.length === 0) {
-          setError("Translates not found.");
-          setLoading(false);
-          return;
-        }
-
-        const examplesResponse = await fetch(
-          "https://api.cognitive.microsofttranslator.com/dictionary/examples?api-version=3.0&from=en&to=ru",
-          {
-            method: "POST",
-            headers: {
-              "Ocp-Apim-Subscription-Key":
-                "2sOjnCvNsCBpsib20ymPiEGySXXpwJCDOimvRFrFnzr94mSEQT4QJQQJ99BBAC5RqLJXJ3w3AAAbACOGL0Pl",
-              "Ocp-Apim-Subscription-Region": "westeurope",
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(
-              topTranslations.map((translation) => ({
-                Text: word,
-                Translation: translation,
-              }))
-            ),
-          }
-        );
-
-        if (!examplesResponse.ok)
-          throw new Error(`Ошибка примеров: ${examplesResponse.status}`);
-
-        const examplesData = await examplesResponse.json();
-        const allExamples = examplesData
-          .flatMap((item) => item.examples || [])
-          .slice(0, 3);
+        const data = await res.json();
+        const allExamples = data.examples || [];
 
         if (allExamples.length === 0) {
-          setError("sentence  not found");
+          setError("No examples found.");
         } else {
-          setExamples(allExamples);
+          setExamples(allExamples.slice(0, 3));
         }
       } catch (err) {
-        console.error("sentence not loading", err);
-        setError("sentence not loading.");
+        console.error("Error loading examples:", err);
+        setError("Failed to load examples.");
       } finally {
         setLoading(false);
       }
