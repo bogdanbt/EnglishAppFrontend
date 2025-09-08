@@ -1,5 +1,5 @@
 // MatchExamplePairsGame.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import api from "../utils/api";
 // import axios from "axios";
 
@@ -8,6 +8,16 @@ const MatchExamplePairsGame = ({ word, onComplete }) => {
   const [cards, setCards] = useState([]);
   const [matchedPairs, setMatchedPairs] = useState([]);
   const [selectedCard, setSelectedCard] = useState(null);
+
+// 🔒 Защёлка от повторных onComplete (в т.ч. из-за StrictMode)
+  const didCompleteRef = useRef(false);
+
+  // Сброс защёлки при смене слова
+  useEffect(() => {
+    didCompleteRef.current = false;
+  }, [word]);
+
+
 
   useEffect(() => {
     const fetchExamplesAndTranslate = async () => {
@@ -68,8 +78,22 @@ const paired = examples.map((e, i) => ({ en: e, ru: translations[i] }));
     }
   };
 
+  // useEffect(() => {
+  //   if (matchedPairs.length * 2 === cards.length && cards.length > 0) {
+  //     onComplete?.();
+  //   }
+  // }, [matchedPairs, cards.length, onComplete]);
+
+  // const getCardClass = (card) => {
+  //   if (isMatched(card)) return "bg-success text-white";
+  //   if (selectedCard?.value === card.value) return "bg-warning";
+  //   return "bg-light text-dark";
+  // };
+// ✅ Одноразовый вызов onComplete
   useEffect(() => {
-    if (matchedPairs.length * 2 === cards.length && cards.length > 0) {
+    const allMatched = cards.length > 0 && matchedPairs.length * 2 === cards.length;
+    if (allMatched && !didCompleteRef.current) {
+      didCompleteRef.current = true;
       onComplete?.();
     }
   }, [matchedPairs, cards.length, onComplete]);
