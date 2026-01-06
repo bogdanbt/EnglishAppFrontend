@@ -148,62 +148,32 @@ export default function MatchExamplePairsGame({ word, onComplete }) {
     setSelectedCard(null);
     setLoading(true);
 
-    // (async () => {
-    //   try {
-    //     const res = await api.get(`/examples/${encodeURIComponent(word)}`);
-    //     const examples = res.data?.examples || [];
-    //     const tr = await api.post("/translate", { texts: examples });
-    //     const translations = tr.data?.translations || [];
-
-    //     const pairs = examples.map((e, i) => ({ en: e, ru: translations[i] }));
-    //     const shuffled = shuffle(
-    //       pairs.flatMap(p => [
-    //         { type: "en", value: p.en, pair: p.ru },
-    //         { type: "ru", value: p.ru, pair: p.en },
-    //       ])
-    //     );
-    //     setCards(shuffled);
-    //   } catch (e) {
-    //     console.error("load/translate failed:", e);
-    //     // если слово пустое/ошибка — не блокируемся
-    //     if (!completedRef.current) {
-    //       completedRef.current = true;
-    //       onComplete?.();
-    //     }
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    // })();
-        (async () => {
+    (async () => {
       try {
-        const r = await api.post("/word-card/resolve", {
-          word,
-          targetLang: "ru",
-          levelHint: "B1",
-        });
+        const res = await api.get(`/examples/${encodeURIComponent(word)}`);
+        const examples = res.data?.examples || [];
+        const tr = await api.post("/translate", { texts: examples });
+        const translations = tr.data?.translations || [];
 
-        const examples = r.data?.examples || [];
-        const pairs = examples
-          .filter((e) => e?.en && e?.translations?.ru)
-          .map((e) => ({ en: e.en, ru: e.translations.ru }));
-
+        const pairs = examples.map((e, i) => ({ en: e, ru: translations[i] }));
         const shuffled = shuffle(
-          pairs.flatMap((p) => [
+          pairs.flatMap(p => [
             { type: "en", value: p.en, pair: p.ru },
             { type: "ru", value: p.ru, pair: p.en },
           ])
         );
-
         setCards(shuffled);
       } catch (e) {
-        console.error("resolve failed:", e);
-        // НЕ пропускаем слово молча — просто покажем пусто и дадим перезагрузить
-        setCards([]);
+        console.error("load/translate failed:", e);
+        // если слово пустое/ошибка — не блокируемся
+        if (!completedRef.current) {
+          completedRef.current = true;
+          onComplete?.();
+        }
       } finally {
         setLoading(false);
       }
     })();
-
   }, [word, onComplete]);
 
   const shuffle = (a) => a.slice().sort(() => Math.random() - 0.5);

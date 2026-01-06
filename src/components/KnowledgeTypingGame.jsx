@@ -20,42 +20,25 @@ const KnowledgeTypingGame = ({ word, userId, courseName, onComplete }) => {
       setTranslation("");
       setLoading(true);
 
-      // let example = "";
-      // try {
-      //   const res = await API.get(`/examples/${encodeURIComponent(word)}`);
-      //   example = res?.data?.examples?.[0] || "";
-      // } catch {
-      //   // fallback
-      // }
-
-      // if (!example) {
-      //   example = `This is a sample sentence with the word ${word}.`;
-      // }
-
-      // setSentence(example);
-
-      // try {
-      //   const res = await API.post("/translate", { texts: [example] });
-      //   const translated = res?.data?.translations?.[0] || "(перевод недоступен)";
-      //   setTranslation(translated);
-      // } catch {
-      //   setTranslation("(перевод недоступен)");
-      // }
+      let example = "";
       try {
-        const res = await API.post("/word-card/resolve", {
-          word,
-          targetLang: "ru",
-          levelHint: "B1",
-        });
+        const res = await API.get(`/examples/${encodeURIComponent(word)}`);
+        example = res?.data?.examples?.[0] || "";
+      } catch {
+        // fallback
+      }
 
-        const ex = res?.data?.examples?.[0];
-        const en = ex?.en || "";
-        const ru = ex?.translations?.ru || "(перевод недоступен)";
+      if (!example) {
+        example = `This is a sample sentence with the word ${word}.`;
+      }
 
-        setSentence(en);
-        setTranslation(ru);
-      } catch (e) {
-        setSentence("");
+      setSentence(example);
+
+      try {
+        const res = await API.post("/translate", { texts: [example] });
+        const translated = res?.data?.translations?.[0] || "(перевод недоступен)";
+        setTranslation(translated);
+      } catch {
         setTranslation("(перевод недоступен)");
       }
 

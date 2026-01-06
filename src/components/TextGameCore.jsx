@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import "./UsageExamples.css";
-import API from "../utils/api";
 
 const TextGameCore = ({ word, onNext }) => {
   const [examples, setExamples] = useState([]);
@@ -116,76 +115,27 @@ const TextGameCore = ({ word, onNext }) => {
       setLoading(true);
       setError(null);
 
-      // try {
-      //   const res = await fetch("/api/word-examples", {
-      //     method: "POST",
-      //     headers: { "Content-Type": "application/json" },
-      //     body: JSON.stringify({ word }),
-      //   });
-
-      //   if (!res.ok) throw new Error("Failed to fetch word examples");
-
-      //   const data = await res.json();
-      //   const allExamples = data.examples || [];
-
-      //   if (allExamples.length === 0) {
-      //     setError("No examples found.");
-      //   } else {
-      //     setExamples(allExamples.slice(0, 3));
-      //   }
-      // } catch (err) {
-        // console.error("Error loading examples:", err);
-        // setError("Failed to load examples.");
-      // }
       try {
-  const r = await API.post("/word-card/resolve", {
-    word,
-    targetLang: "ru",
-    levelHint: "B1",
-  });
+        const res = await fetch("/api/word-examples", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ word }),
+        });
 
-  const cardExamples = r.data?.examples || [];
+        if (!res.ok) throw new Error("Failed to fetch word examples");
 
-  const split = (sentence, term) => {
-    if (!sentence) return { prefix: "", term: "", suffix: "" };
-    const re = new RegExp(`\\b${term}\\b`, "i");
-    const m = sentence.match(re);
-    if (!m) return { prefix: sentence, term: "", suffix: "" };
-    const idx = sentence.toLowerCase().indexOf(m[0].toLowerCase());
-    return {
-      prefix: sentence.slice(0, idx),
-      term: sentence.slice(idx, idx + m[0].length),
-      suffix: sentence.slice(idx + m[0].length),
-    };
-  };
+        const data = await res.json();
+        const allExamples = data.examples || [];
 
-  const prepared = cardExamples.slice(0, 3).map((ex) => {
-    const src = split(ex.en, word);
-    const tgtSentence = ex.translations?.ru || "";
-
-    return {
-      sourcePrefix: src.prefix,
-      sourceTerm: src.term || word,
-      sourceSuffix: src.suffix,
-
-      // RU: пока без выделения "term" (позже можно улучшить)
-      targetPrefix: tgtSentence,
-      targetTerm: "",
-      targetSuffix: "",
-    };
-  });
-
-  if (prepared.length === 0) {
-    setError("No examples found.");
-  } else {
-    setExamples(prepared);
-  }
-} catch (err) {
-  console.error("Error loading examples:", err);
-  setError("Failed to load examples.");
-}
- 
-      finally {
+        if (allExamples.length === 0) {
+          setError("No examples found.");
+        } else {
+          setExamples(allExamples.slice(0, 3));
+        }
+      } catch (err) {
+        console.error("Error loading examples:", err);
+        setError("Failed to load examples.");
+      } finally {
         setLoading(false);
       }
     };
@@ -317,7 +267,7 @@ const TextGameCore = ({ word, onNext }) => {
                   />
                 ) : (
                   <h5 className="typing-text text-success">
-                    {examples[1]?.sourceTerm}
+                    {examples[0]?.sourceTerm}
                   </h5>
                 )}
               </form>
@@ -383,7 +333,7 @@ const TextGameCore = ({ word, onNext }) => {
                   />
                 ) : (
                   <h5 className="typing-text text-success">
-                    {examples[2]?.sourceTerm}
+                    {examples[0]?.sourceTerm}
                   </h5>
                 )}
               </form>
