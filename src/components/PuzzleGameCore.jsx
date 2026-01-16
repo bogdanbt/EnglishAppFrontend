@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import "./WordIntervalPuzzle.css";
+import API from "../utils/api";
 
 const PuzzleGameCore = ({ wordData, onNext }) => {
   const [shuffledLetters, setShuffledLetters] = useState([]);
@@ -29,12 +30,23 @@ const PuzzleGameCore = ({ wordData, onNext }) => {
     if (!isCorrect) return;
 
     try {
-      const audio = new Audio(
-        `http://localhost:5000/speak/${encodeURIComponent(wordData.word)}`
-      );
-      audio.play().catch((err) => {
-        console.warn("audio error:", err);
-      });
+      const playTts = async () => {
+  const res = await API.get(`/speak/${encodeURIComponent(wordData.word)}`, {
+    responseType: "blob",
+  });
+
+  const url = URL.createObjectURL(res.data);
+  const audio = new Audio(url);
+
+  audio.addEventListener("ended", () => URL.revokeObjectURL(url), { once: true });
+
+  await audio.play();
+};
+
+playTts().catch((err) => {
+  console.warn("audio error:", err);
+});
+
     } catch (error) {
       console.warn("audioerror:", error);
     }

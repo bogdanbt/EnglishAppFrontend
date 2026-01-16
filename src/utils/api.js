@@ -24,8 +24,10 @@ API.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
+    // if (error.response?.status === 401 && !originalRequest._retry) {
+    if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry) {
+  
+    originalRequest._retry = true;
 
       try {
         const { data } = await axios.post(
@@ -37,7 +39,16 @@ API.interceptors.response.use(
         localStorage.setItem("accessToken", data.accessToken);
         originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
 
-        return axios(originalRequest); // Retry with new token
+        const method = (originalRequest.method || "get").toLowerCase();
+const isIdempotent = ["get", "head", "options"].includes(method);
+
+if (!isIdempotent) {
+  // ❌ не повторяем POST/PUT/PATCH/DELETE автоматически
+  return Promise.reject(error);
+}
+
+return axios(originalRequest);
+
       } catch (refreshError) {
         localStorage.removeItem("accessToken");
         return Promise.reject(refreshError);
