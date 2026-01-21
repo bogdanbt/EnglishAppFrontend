@@ -43,7 +43,7 @@ useEffect(() => {
   const current = wordList?.[0];
   if (!user?.id || !current) return;
 
-  const wordId = current._id || current.wordId;
+const wordId = current._id || current.wordId || current.id;
   if (!wordId) {
     setEnrichment(null);
     setEnrichError("Current word has no _id/wordId in gameWordList.");
@@ -101,7 +101,11 @@ setEnrichment(null); // ✅ сброс старых данных при ново
 
       throw new Error("AI enrichment timeout. Try again.");
     } catch (e) {
-      const msg = e?.response?.data?.error || e?.message || "AI enrichment failed";
+const msg =
+  e?.response?.data?.error ||
+  e?.response?.data?.message ||
+  e?.message ||
+  "AI enrichment failed";
       if (!cancelled) setEnrichError(msg);
     } finally {
       if (!cancelled) setEnrichLoading(false);
@@ -112,9 +116,11 @@ setEnrichment(null); // ✅ сброс старых данных при ново
   run();
 
   return () => {
-    cancelled = true;
-  };
-}, [user?.id, wordList?.[0]?._id, wordList?.[0]?.wordId]);
+  cancelled = true;
+  DailyGames.__inFlightKey = null;
+};
+
+}, [user?.id, wordList?.[0]?._id, wordList?.[0]?.wordId, wordList?.[0]?.id]);
 
 
   const handleWordComplete = async () => {

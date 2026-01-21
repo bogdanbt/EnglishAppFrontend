@@ -114,7 +114,7 @@ const LessonRevision = () => {
   useEffect(() => {
     if (!user?.id || !current) return;
 
-    const wordId = current._id || current.wordId;
+const wordId = current._id || current.wordId || current.id;
     if (!wordId) {
       setEnrichment(null);
       setEnrichError("Current word has no _id/wordId in gameWordList.");
@@ -179,9 +179,11 @@ run();
 
 
     return () => {
-      cancelled = true;
-    };
-  }, [user?.id, current?._id, current?.wordId]);
+  cancelled = true;
+  LessonRevision.__inFlightKey = null;
+};
+
+}, [user?.id, current?._id, current?.wordId, current?.id]);
 
   return (
     <div className="container mt-5">
