@@ -111,79 +111,76 @@ const LessonRevision = () => {
   const current = wordList[0];
 
   // AI enrichment для текущего слова перед запуском раунда
-  useEffect(() => {
-    if (!user?.id || !current) return;
+useEffect(() => {
+  if (!user?.id || !current) return;
 
-const wordId = current._id || current.wordId || current.id;
-    if (!wordId) {
-      setEnrichment(null);
-      setEnrichError("Current word has no _id/wordId in gameWordList.");
-      return;
-    }
-// ✅ single-flight: не запускать второй enrichment на тот же wordId
-const key = String(wordId);
-if (LessonRevision.__inFlightKey === key) return;
-LessonRevision.__inFlightKey = key;
+  const word = current.word?.trim().toLowerCase();
+  if (!word) {
+    setEnrichment(null);
+    setEnrichError("No word found in gameWordList.");
+    return;
+  }
 
-    let cancelled = false;
+  // single-flight
+  if (LessonRevision.__inFlightKey === word) return;
+  LessonRevision.__inFlightKey = word;
 
-    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  let cancelled = false;
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-const run = async () => {
-  setEnrichLoading(true);
-  setEnrichError(null);
-  setEnrichment(null);
+  const run = async () => {
+    setEnrichLoading(true);
+    setEnrichError(null);
+    setEnrichment(null);
 
-  try {
-    // 1) стартуем генерацию 1 раз
-    const start = await API.post("/ai/enrich-word", { wordId });
+    try {
+      // 1) стартуем генерацию
+      const start = await API.post("/ai/enrich-word", { word });
 
-    // если сразу готово
-    if (start.data?.status === "ready") {
-      if (!cancelled) setEnrichment(start.data);
-      return;
-    }
-
-    // 2) дальше ТОЛЬКО polling GET
-    for (let i = 0; i < 12 && !cancelled; i++) {
-      await sleep(700);
-
-      const res = await API.get(`/ai/enrich-word/${encodeURIComponent(wordId)}`);
-
-      if (res.data?.status === "ready") {
-        if (!cancelled) setEnrichment(res.data);
+      if (start.data?.status === "ready") {
+        if (!cancelled) setEnrichment(start.data);
         return;
       }
 
-      if (res.data?.status === "failed") {
-        throw new Error(res.data?.error || "AI enrichment failed");
+      // 2) polling GET
+      for (let i = 0; i < 12 && !cancelled; i++) {
+        await sleep(700);
+
+        const res = await API.get(
+          `/ai/enrich-word?word=${encodeURIComponent(word)}`
+        );
+
+        if (res.data?.status === "ready") {
+          if (!cancelled) setEnrichment(res.data);
+          return;
+        }
+
+        if (res.data?.status === "failed") {
+          throw new Error(res.data?.error || "AI enrichment failed");
+        }
       }
+
+      throw new Error("AI enrichment timeout. Try again.");
+    } catch (e) {
+      const msg =
+        e?.response?.data?.error ||
+        e?.response?.data?.message ||
+        e?.message ||
+        "AI enrichment failed";
+      if (!cancelled) setEnrichError(msg);
+    } finally {
+      if (!cancelled) setEnrichLoading(false);
+      LessonRevision.__inFlightKey = null;
     }
+  };
 
-    throw new Error("AI enrichment timeout. Try again.");
-  } catch (e) {
-    const msg =
-      e?.response?.data?.error ||
-      e?.response?.data?.message ||
-      e?.message ||
-      "AI enrichment failed";
-    if (!cancelled) setEnrichError(msg);
-  }  finally {
-  if (!cancelled) setEnrichLoading(false);
-  LessonRevision.__inFlightKey = null; // ✅
-}
+  run();
 
-};
-
-run();
-
-
-    return () => {
-  cancelled = true;
-  LessonRevision.__inFlightKey = null;
-};
-
-}, [user?.id, current?._id, current?.wordId, current?.id]);
+  return () => {
+    cancelled = true;
+    LessonRevision.__inFlightKey = null;
+  };
+}, [user?.id, current?.word]);
 
   return (
     <div className="container mt-5">

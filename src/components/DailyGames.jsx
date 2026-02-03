@@ -43,12 +43,13 @@ useEffect(() => {
   const current = wordList?.[0];
   if (!user?.id || !current) return;
 
-const wordId = current._id || current.wordId || current.id;
-  if (!wordId) {
-    setEnrichment(null);
-    setEnrichError("Current word has no _id/wordId in gameWordList.");
-    return;
-  }
+const word = current.word?.trim().toLowerCase();
+if (!word) {
+  setEnrichment(null);
+  setEnrichError("No word found in gameWordList.");
+  return;
+}
+
 
   // ✅ single-flight: не запускай второй enrichment на тот же wordId
   // (если StrictMode/перерендеры — это спасает)
@@ -71,7 +72,7 @@ setEnrichment(null); // ✅ сброс старых данных при ново
 
     try {
       // 1) стартуем генерацию ровно 1 раз
-      const start = await API.post("/ai/enrich-word", { wordId });
+      const start = await API.post("/ai/enrich-word", { word });
 
       // если сразу ready — отлично
       if (start.data?.status === "ready") {
@@ -89,7 +90,7 @@ setEnrichment(null); // ✅ сброс старых данных при ново
       // 2) polling только GET
       for (let i = 0; i < 12 && !cancelled; i++) {
         await sleep(700);
-        const res = await API.get(`/ai/enrich-word/${encodeURIComponent(wordId)}`);
+const res = await API.get(`/ai/enrich-word?word=${encodeURIComponent(word)}`);
         if (res.data?.status === "ready") {
           if (!cancelled) setEnrichment(res.data);
           return;
@@ -120,7 +121,7 @@ const msg =
   DailyGames.__inFlightKey = null;
 };
 
-}, [user?.id, wordList?.[0]?._id, wordList?.[0]?.wordId, wordList?.[0]?.id]);
+}, [user?.id, wordList?.[0]?.word]);
 
 
   const handleWordComplete = async () => {
